@@ -1,0 +1,185 @@
+<div>
+
+    <div class="header">
+        <h2 class="mb-4">Extension Settings</h2>
+    </div>
+    <div class="card shadow-lg rounded-4 mx-auto" style="max-width: 600px;">
+        <div class="card-body p-4">
+
+            <!-- Auto Login Toggle -->
+            <div class="form-check form-switch mb-4">
+                <input class="form-check-input" type="checkbox" id="autoLogin" role="switch" />
+                <label class="form-check-label" for="autoLogin">Enable Auto Login</label>
+            </div>
+
+            <!-- Collapsible Fields -->
+            <div class="collapse mb-4" id="settingsFields">
+                <!-- API Key Input -->
+                <div class="">
+                    <label for="apiKey" class="form-label">
+                        Gemini API Key<span class="text-danger">* </span>
+                        <span class="info-icon text-info">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"
+                                fill="#0d6efd">
+                                <path transform="scale(0.03125)"
+                                    d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85 
+    c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786 
+    c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576 
+    c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765 
+    c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z" />
+                            </svg>
+
+                            <span class="tooltip-text">
+                                <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">
+                                    Click here
+                                </a> to get your API Key.
+                            </span>
+                        </span>
+
+                    </label>
+                    <input type="text" class="form-control" id="apiKey" placeholder="Enter your Gemini API key" />
+                    <p role="alert" class="wrongData" id="wrongApi" style="display: none;">
+                        You must provide a valid Api-Key.
+                    </p>
+                    
+                </div>
+                <dev class="row mt-2">
+                    <div class="col">
+                        <label for="apiKey" class="form-label">
+                            Username
+                        <span class="info-icon text-info">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"
+                                fill="#0d6efd">
+                                <path transform="scale(0.03125)"
+                                    d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85 
+    c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786 
+    c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576 
+    c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765 
+    c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z" />
+                            </svg>
+
+                            <span class="tooltip-text">
+                                Enter your student portal username.
+                            </span>
+                        </span>
+                        </label>
+                        <input type="text" class="form-control" id="username" placeholder="Enter your Username" />
+                    </div>
+                    <div class="col">
+                        <label for="apiKey" class="form-label">
+                            Password
+                        <span class="info-icon text-info">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"
+                                fill="#0d6efd">
+                                <path transform="scale(0.03125)"
+                                    d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85 
+    c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786 
+    c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576 
+    c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765 
+    c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z" />
+                            </svg>
+
+                            <span class="tooltip-text">
+                                Enter your student portal password.
+                            </span>
+                        </span>
+                        </label>
+                        <input type="password" class="form-control" id="password" placeholder="Enter your Password" />
+                    </div>
+                </dev>
+                <p role="alert" class="wrongData" id="wrongApi" style="color: green;">
+                    Note: You can leave Username and Password blank.
+                </p>
+            </div>
+
+            <!-- Show Tomorrow's Routine At -->
+
+            <div class="mb-3">
+                <label for="apiKey" class="form-label">
+                    Select time to show tomorrow's routine<span class="text-danger">* </span>
+                    <span class="info-icon text-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16"
+                            fill="#0d6efd">
+                            <path transform="scale(0.03125)"
+                                d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85 
+    c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786 
+    c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576 
+    c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765 
+    c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z" />
+                        </svg>
+                        <span class="tooltip-text">
+                            By default, the extension shows tomorrow's routine after 4:00 PM. You can change it here.
+                        </span>
+                    </span>
+
+                </label>
+                <div class="row g-2">
+                    <div class="col-4">
+                        <select class="form-select" id="hour">
+                            <option disabled selected>Hour</option>
+                            <!-- 12-hour format -->
+                            <option>01</option>
+                            <option>02</option>
+                            <option>03</option>
+                            <option>04</option>
+                            <option>05</option>
+                            <option>06</option>
+                            <option>07</option>
+                            <option>08</option>
+                            <option>09</option>
+                            <option>10</option>
+                            <option>11</option>
+                            <option>12</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select class="form-select" id="minute">
+                            <option disabled selected>Min</option>
+                            <!-- Minutes -->
+                            <option>00</option>
+                            <option>05</option>
+                            <option>10</option>
+                            <option>15</option>
+                            <option>20</option>
+                            <option>25</option>
+                            <option>30</option>
+                            <option>35</option>
+                            <option>40</option>
+                            <option>45</option>
+                            <option>50</option>
+                            <option>55</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <select class="form-select" id="ampm">
+                            <option disabled selected>AM/PM</option>
+                            <option>AM</option>
+                            <option>PM</option>
+                        </select>
+                    </div>
+                </div>
+                <p role="alert " class="wrongData" id="wrongtime" style="display: none;">
+                    You must select the hour, minute, and AM/PM.
+                </p>
+            </div>
+
+            <!-- Save Button -->
+            <div class="text-end">
+                <button class="btn btn-primary px-4" id="save-settings">
+                    Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Alert Box -->
+<div id="alertContainer" style="display: none;">
+
+    <div id="successAlert" class="alert alert-success d-flex align-items-center custom-alert" role="alert">
+        <span class="alert-icon" style="margin-right: 5px; font-size: 12px;">✓</span>
+        <div class="flex-grow-1">
+            Saved!
+        </div>
+        <button type="button" id="btnclose">×</button>
+    </div>
+</div>

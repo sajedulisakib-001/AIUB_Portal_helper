@@ -1,0 +1,422 @@
+[
+    {
+        "date": "Jan 1",
+        "day_of_week": "Wednesday",
+        "name": "New Year's Day",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Jan 10",
+        "day_of_week": "Friday",
+        "name": "Bangabandhu Homecoming Day",
+        "type": "Observance"
+    },
+    {
+        "date": "Jan 28",
+        "day_of_week": "Tuesday",
+        "name": "Shab-e-Meraj",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Feb 3",
+        "day_of_week": "Monday",
+        "name": "Saraswati Puja",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Feb 11",
+        "day_of_week": "Tuesday",
+        "name": "Maghi Purnima",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Feb 14",
+        "day_of_week": "Friday",
+        "name": "Valentine's Day",
+        "type": "Observance"
+    },
+    {
+        "date": "Feb 15",
+        "day_of_week": "Saturday",
+        "name": "Shab e-Barat",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Feb 21",
+        "day_of_week": "Friday",
+        "name": "Language Martyrs' Day",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Feb 26",
+        "day_of_week": "Wednesday",
+        "name": "Maha Shivaratri",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Mar 2",
+        "day_of_week": "Sunday",
+        "name": "National Flag Day",
+        "type": "Observance"
+    },
+    {
+        "date": "Mar 2",
+        "day_of_week": "Sunday",
+        "name": "Ramadan Start",
+        "type": "Observance"
+    },
+    {
+        "date": "Mar 5",
+        "day_of_week": "Wednesday",
+        "name": "Ash Wednesday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Mar 13",
+        "day_of_week": "Thursday",
+        "name": "Doljatra",
+        "type": "Observance"
+    },
+    {
+        "date": "Mar 14",
+        "day_of_week": "Friday",
+        "name": "Holi",
+        "type": "Hindu Holiday"
+    },
+    {
+        "date": "Mar 20",
+        "day_of_week": "Thursday",
+        "name": "March Equinox",
+        "type": "Season"
+    },
+    {
+        "date": "Mar 26",
+        "day_of_week": "Wednesday",
+        "name": "Independence Day",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Mar 27",
+        "day_of_week": "Thursday",
+        "name": "Arrival Day of Sri Sri Harichand Tagore",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Mar 28",
+        "day_of_week": "Friday",
+        "name": "Shab-e-qadr",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Mar 29",
+        "day_of_week": "Saturday",
+        "name": "Eid ul-Fitr Holiday",
+        "type": "National Holiday"
+    },
+    {
+        "date": "Mar 30",
+        "day_of_week": "Sunday",
+        "name": "Eid ul-Fitr Holiday",
+        "type": "National Holiday"
+    },
+    {
+        "date": "Mar 31",
+        "day_of_week": "Monday",
+        "name": "Eid ul-Fitr",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Apr 1",
+        "day_of_week": "Tuesday",
+        "name": "Eid ul-Fitr Holiday",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Apr 2",
+        "day_of_week": "Wednesday",
+        "name": "Eid ul-Fitr Holiday",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Apr 3",
+        "day_of_week": "Thursday",
+        "name": "Eid ul-Fitr Holiday",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Apr 13",
+        "day_of_week": "Sunday",
+        "name": "Chaitra Sankranti",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Apr 14",
+        "day_of_week": "Monday",
+        "name": "Bengali New Year",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Apr 17",
+        "day_of_week": "Thursday",
+        "name": "Maundy Thursday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Apr 18",
+        "day_of_week": "Friday",
+        "name": "Good Friday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Apr 19",
+        "day_of_week": "Saturday",
+        "name": "Holy Saturday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Apr 20",
+        "day_of_week": "Sunday",
+        "name": "Easter Day",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Apr 21",
+        "day_of_week": "Monday",
+        "name": "Easter Monday",
+        "type": "Observance"
+    },
+    {
+        "date": "May 1",
+        "day_of_week": "Thursday",
+        "name": "May Day",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "May 10",
+        "day_of_week": "Saturday",
+        "name": "Buddha Purnima Holiday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "May 11",
+        "day_of_week": "Sunday",
+        "name": "Buddha Purnima/Vesak",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "May 11",
+        "day_of_week": "Sunday",
+        "name": "Mothers' Day",
+        "type": "Observance"
+    },
+    {
+        "date": "May 12",
+        "day_of_week": "Monday",
+        "name": "Buddha Purnima Holiday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Jun 5",
+        "day_of_week": "Thursday",
+        "name": "Eid al-Adha Holiday (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Jun 6",
+        "day_of_week": "Friday",
+        "name": "Eid al-Adha Holiday (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Jun 7",
+        "day_of_week": "Saturday",
+        "name": "Eid al-Adha (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Jun 8",
+        "day_of_week": "Sunday",
+        "name": "Eid al-Adha Holiday (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Jun 9",
+        "day_of_week": "Monday",
+        "name": "Eid al-Adha Holiday (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Jun 10",
+        "day_of_week": "Tuesday",
+        "name": "Eid al-Adha Holiday (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Jun 11",
+        "day_of_week": "Wednesday",
+        "name": "Eid al-Adha Holiday (Tentative Date)",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Jun 15",
+        "day_of_week": "Sunday",
+        "name": "Fathers' Day",
+        "type": "Observance"
+    },
+    {
+        "date": "Jun 21",
+        "day_of_week": "Saturday",
+        "name": "June Solstice",
+        "type": "Season"
+    },
+    {
+        "date": "Jun 27",
+        "day_of_week": "Friday",
+        "name": "Muharram (Tentative Date)",
+        "type": "Observance"
+    },
+    {
+        "date": "Jul 1",
+        "day_of_week": "Tuesday",
+        "name": "July 1 Bank Holiday",
+        "type": "Bank Holiday"
+    },
+    {
+        "date": "Jul 6",
+        "day_of_week": "Sunday",
+        "name": "Ashura (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Jul 9",
+        "day_of_week": "Wednesday",
+        "name": "Ashari Purnima",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Aug 16",
+        "day_of_week": "Saturday",
+        "name": "Janmashtami",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Aug 20",
+        "day_of_week": "Wednesday",
+        "name": "Akhari Chahar Somba (Tentative Date)",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Sep 5",
+        "day_of_week": "Friday",
+        "name": "Eid e-Milad-un Nabi (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Sep 6",
+        "day_of_week": "Saturday",
+        "name": "Madhu Purnima",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Sep 21",
+        "day_of_week": "Sunday",
+        "name": "Mahalaya",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Sep 23",
+        "day_of_week": "Tuesday",
+        "name": "September Equinox",
+        "type": "Season"
+    },
+    {
+        "date": "Sep 29",
+        "day_of_week": "Monday",
+        "name": "Durga Puja Holiday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Sep 30",
+        "day_of_week": "Tuesday",
+        "name": "Ashtami",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Oct 1",
+        "day_of_week": "Wednesday",
+        "name": "Mahanabami",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Oct 2",
+        "day_of_week": "Thursday",
+        "name": "Durga Puja",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Oct 4",
+        "day_of_week": "Saturday",
+        "name": "Fateha-i-Yajdaham (Tentative Date)",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Oct 5",
+        "day_of_week": "Sunday",
+        "name": "Prabarana Purnima",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Oct 6",
+        "day_of_week": "Monday",
+        "name": "Lakshmi Puja",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Oct 20",
+        "day_of_week": "Monday",
+        "name": "Sri Shayama Puja",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Oct 31",
+        "day_of_week": "Friday",
+        "name": "Halloween",
+        "type": "Observance"
+    },
+    {
+        "date": "Dec 16",
+        "day_of_week": "Tuesday",
+        "name": "Victory Day",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Dec 21",
+        "day_of_week": "Sunday",
+        "name": "December Solstice",
+        "type": "Season"
+    },
+    {
+        "date": "Dec 24",
+        "day_of_week": "Wednesday",
+        "name": "Christmas Eve",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Dec 25",
+        "day_of_week": "Thursday",
+        "name": "Christmas Day",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "Dec 26",
+        "day_of_week": "Friday",
+        "name": "Boxing Day",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "Dec 31",
+        "day_of_week": "Wednesday",
+        "name": "New Year's Eve",
+        "type": "Bank Holiday"
+    }
+]

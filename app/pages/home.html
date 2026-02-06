@@ -1,0 +1,67 @@
+<div class="header">
+    <h2 id="greeting">👋 Good Morning!</h2>
+    <p class="text-muted">Here's your daily class routine</p>
+</div>
+<div class="fancy-scrollbar" style="overflow-y: auto;">
+    <div class="date-display" id="currentDate-next" style="display: none;"></div>
+    <div class="routine-box" id="routineList-next" style="display: none;">
+        <!-- list of classes will be shown here -->
+    </div>
+    <div class="date-display" id="currentDate" style="display: none;"></div>
+    <div class="routine-box" id="routineList">
+        <!-- list of classes will be shown here -->
+    </div>
+</div>
+<div class="button-group w-50 px-5 mx-auto">
+    <button style="display: block" id="reloadRoutine">🔄 Reload</button>
+</div>
+<button class="showNotification" id="showUpdatePopUp"
+    style="top: 0px; left: 0px; right: auto; display: none;">🆕</button>
+<!-- Add Popup code here-->
+
+<div id="updatePopUpBox" class="custom-popup">
+    <span class="close-btn" id="closePopup" style="position: fixed;right: 10px;top: 0px;">&times;</span>
+    <h5 class="mb-2">New Version Available!</h5>
+    <span class="badge bg-warning text-dark show-tooltip">
+        <div id="updateType">Patch</div>
+        <span class="tooltip">
+            <table class="tooltip-style-table">
+                <thead>
+                    <tr>
+                        <th>Update Type</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Major<span class="text-danger">**</span></td>
+                        <td>Includes breaking changes or major feature upgrades.</td>
+                    </tr>
+                    <tr>
+                        <td>Minor<span class="text-danger">*</span></td>
+                        <td>Updated data or added feature</td>
+                    </tr>
+                    <tr>
+                        <td>Patch</td>
+                        <td>Bug fixes or small tweaks for stability or performance.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p class="tooltip-note">
+                <span class="text-danger">*</span> This symbol means you must update to this version.
+            </p>
+        </span>
+    </span>
+
+    <p>
+        A newer version (<span id="version"></span>) of this extension is ready for you!
+        <br><br>
+        👉 <a href="https://github.com/sajedulsakib001/AIUB_Portal_helper/archive/refs/heads/main.zip">Click here to
+            download the latest version</a>
+        <br>
+        📘 <a href="https://github.com/sajedulsakib001/AIUB_Portal_helper/?tab=readme-ov-file#update"
+            target="_blank">See how to update</a>
+        <br>
+        <button class="btn btn-primary mt-3" id="reload_extension">Reload Extension</button>
+    </p>
+</div>
