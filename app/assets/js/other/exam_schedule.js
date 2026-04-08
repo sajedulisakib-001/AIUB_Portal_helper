@@ -16,11 +16,15 @@ async function displayExamSchedule(reload = false) {
             const td1 = document.createElement("td");
             const td2 = document.createElement("td");
             const td3 = document.createElement("td");
+            
+            td1.style.width = "23%";
+            td2.style.width = "27%";
+            td3.style.width = "50%";
 
             td1.innerText = exam["examDate"];
             td2.innerText = exam["examTime"];
             td3.innerText = exam["courseName"] + " [" + exam["section"] + "]";
-            tr.append(td3, td1, td2);
+            tr.append(td1, td2, td3);
             tbody.append(tr);
         }
     };
