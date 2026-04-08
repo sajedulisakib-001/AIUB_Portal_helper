@@ -3,7 +3,7 @@
     "name": "Aiub Portal Helper",
     "version": "1.3.0",
     "description": "This is a simple Chrome extension for AIUB Students.",
-    "update_url": "https://raw.githubusercontent.com/sajedulsakib001/AIUB_Portal_helper/main/update/update.xml",
+    "update_url": "https://raw.githubusercontent.com/sajedulisakib-001/AIUB_Portal_helper/main/update/update.xml",
     "action": {
         "default_popup": "index.html",
         "default_icon": {
