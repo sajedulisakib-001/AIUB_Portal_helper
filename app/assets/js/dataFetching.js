@@ -278,22 +278,25 @@ function getExamRoutine() {
                     const doc = parser.parseFromString(html, "text/html");
 
                     const rows = doc.querySelectorAll("#routineBody tr");
-
-                    const result = [];
-
+                    
+                    const result = { term: "", schedule: [] };
+                    const nameOfTermAndYear = doc.querySelector("#main-content > div > h3")?.innerText.trim().split(" TERM EXAM SCHEDULE OF ");
+                    const term = nameOfTermAndYear[0]?.split(" ").pop() || "";
+                    const year = nameOfTermAndYear[1]?.split(" [")[0] || "";
+                    if (term) {
+                        result.term = term +" TERM EXAM SCHEDULE OF " + year;
+                    }
                     rows.forEach(row => {
                         const cells = row.querySelectorAll("td");
-
-                        result.push({
-                            section: cells[0]?.textContent.trim(),
-                            examDate: cells[1]?.textContent.trim(),
-                            examTime: cells[2]?.textContent.trim(),
-                            roomNo: cells[3]?.textContent.trim(),
-                            columnNo: cells[4]?.textContent.trim(),
-                            seatNo: cells[5]?.textContent.trim()
+                        const sctions = cells[0]?.innerText.trim().split("] ")[1]?.split(" [") || [];
+                        result.schedule.push({
+                            courseName: sctions[0],
+                            section: sctions[1]?.[0],
+                            examDate: cells[1]?.innerText.trim(),
+                            examTime: cells[2]?.innerText.trim(),
                         });
                     });
-
+                    
                     return result;
                 }
             }, (results) => {

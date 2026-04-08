@@ -31,7 +31,7 @@ function setupOtherMenu() {
                 }
                 if (topic=== "examSchedule"){
                     setupExamSchedulePage();
-                    setTimeout()
+                    setTimeout(displayExamSchedule, 1000);
                 }
                 
             }, { once: true });

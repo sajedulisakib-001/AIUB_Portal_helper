@@ -71,7 +71,7 @@ async function isUpdateAvailable() {
         latestVersion: currentVersion
     };
     try {
-        const res = await fetch('https://raw.githubusercontent.com/sajedulsakib001/AIUB_Portal_helper/main/manifest.json');
+        const res = await fetch('https://raw.githubusercontent.com/sajedulisakib-001/AIUB_Portal_helper/main/manifest.json');
         const latestVersion = (await res.json()).version;
         result.latestVersion = latestVersion;
         const toNumbers = v => v.split('.').map(n => parseInt(n) || 0);
