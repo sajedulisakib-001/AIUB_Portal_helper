@@ -64,6 +64,19 @@ async function reloadHomePage(reload = false) {
         showRoutine(data);
     }
     if (!reload) {
+        let examData = isExamAvailable();
+        if(examData.isAvailable){
+            setCurrentDates();
+            document.getElementById("homeTitle").style.display = "none";
+            const p1 = document.getElementById("lastUpdated");
+            p1.style.display = "block";
+            p1.textContent = "Best of luck with your exams! Remember to take breaks and stay hydrated. You've got this! 💪";
+            if(examData.lastExam){
+                p1.textContent = "This is the last exam in your schedule. Best of luck! 🎉";
+            }
+            show(examData.data);
+            return;
+        }
         let data = JSON.parse(localStorage.getItem("routine"));
         if (data === null || data.length === 0) {
             await delay(500);
@@ -81,7 +94,6 @@ async function reloadHomePage(reload = false) {
     if (data !== null) {
         show(data.routine);
         setCurrentDates();
-        console.log("Routine: ", data.routine);
         localStorage.setItem("routine", JSON.stringify(data.routine));
         localStorage.setItem("currentCourses", JSON.stringify(data.currentCourses));
         
@@ -191,8 +203,7 @@ function showRoutine(routine) {
         displayRoutine(routine, dates.nextDay, true);
         document.getElementById("routineList-next").style.removeProperty("display");
     }
-    displayRoutine(routine, dates.today);
-
+    displayRoutine(routine, dates.today, false);
 }
 
 /**
@@ -210,14 +221,17 @@ function displayRoutine(routine, date, next = false) {
         for (const todaysClass of day["classes"]) {
             const item = document.createElement("div");
             item.className = "routine-item";
-
             const time = document.createElement("span");
             time.className = "time";
-            time.innerText = todaysClass["time"];
+            time.innerHTML = `${(todaysClass["room"] === "exam")? "<strong style='color: #ff0000;'> (Exam Time)</strong>" : "<strong style='color: #30d453;'> (Regular Class)</strong>"} ${todaysClass["time"]}`;
 
             const subject = document.createElement("span");
             subject.className = "subject";
-            subject.innerHTML = `${todaysClass["course"]} <strong>Room: ${todaysClass["room"]}</strong>`;
+            if (todaysClass["room"] === "exam") {
+                subject.innerText = `${todaysClass["course"]}`;
+            } else {
+                subject.innerHTML = `${todaysClass["course"]} <strong>Room: ${todaysClass["room"]}</strong>`;
+            }
 
             item.appendChild(time);
             item.appendChild(subject);
@@ -227,8 +241,172 @@ function displayRoutine(routine, date, next = false) {
         break;
     }
     if (!found) {
-
-        list.innerHTML = "<center><h5>No Class for " + (next ? "Tomorrow" : "Today") + ".</h5></center>";
+        // Show no classes/exams message
+        list.innerHTML = "<center><h5>No " + (todaysClass["room"] === "exam" ? "Exam" : "Class") + " for " + (next ? "Tomorrow" : "Today") + ".</h5></center>";
     }
 }
 
+
+// function isExamAvailable() {
+//     const examData = JSON.parse(localStorage.getItem("examSchedule"));
+
+//     let isAvailable = false;
+//     let data = [];
+
+//     if (examData === null) {
+//         return {isAvailable, data};
+//     }
+
+//     let exam_Data = examData.schedule;
+//     let l = exam_Data.length;
+
+//     if(l>0) {
+
+//         // Assuming exam_Data is sorted by date, we can directly compare with the first and last exam dates
+//         let firstExamDate = new Date(exam_Data[0].examDate);
+//         let lastDate = new Date(examData.lastDate);
+//         let today= new Date();
+
+
+//         // Set time to 00:00:00 for accurate date comparison
+//         today.setHours(0,0,0,0);
+//         firstExamDate.setHours(0,0,0,0);
+//         lastDate.setHours(0,0,0,0);
+
+//         if(today >= firstExamDate && today <= lastDate){
+
+//             isAvailable = true;
+//             let ftoday = formatDate(today);
+//             lastDate = formatDate(lastDate);
+            
+
+
+//             for (let j = 0; j < l; j++) {
+
+//                 if(exam_Data[j].examDate === "TBA") break;
+
+//                 let examDate = formatDate(new Date(exam_Data[j].parsedDate));
+//                 if(examDate === ftoday){
+//                     data.push({
+//                         "classes": [{
+//                             "course": exam_Data[j].courseName,
+//                             "time": exam_Data[j].examTime,
+//                             "room": "exam"
+//                         }],
+//                         "day": examDate.substring(0, 3)
+//                     });
+
+//                     if(examDate === lastDate){
+//                         const routine = JSON.parse(localStorage.getItem("routine"));
+//                         for (let c of routine) {
+//                             if (c.day === getDateTime().nextDay.substring(0, 3)) {
+//                                 data.push(c);
+//                                 break;
+//                             }
+//                         }
+//                     }
+//                     break;
+//                 }else if(new Date(exam_Data[j].parsedDate) > today){
+
+//                     let nextDay = new Date();
+//                     nextDay.setDate(nextDay.getDate() + 1);
+//                     nextDay = formatDate(nextDay);
+//                     if(examDate === nextDay){
+//                         data.push({
+//                             "classes": [{
+//                                 "course": exam_Data[j].courseName,
+//                                 "time": exam_Data[j].examTime,
+//                                 "room": "exam"
+//                             }],
+//                             "day": examDate.substring(0, 3)
+//                         });
+//                     }
+//                     break;
+//                 }
+//             }
+//         }
+//         return {isAvailable,data};
+//     }
+//     return {isAvailable,data};
+// }
+
+function isExamAvailable() {
+    const examData = JSON.parse(localStorage.getItem("examSchedule"));
+    if (!examData || !examData.schedule?.length) {
+        return { isAvailable: false, data: [] };
+    }
+
+    const normalize = (d) => {
+        const date = new Date(d);
+        date.setHours(0, 0, 0, 0);
+        return date;
+    };
+
+    const today = normalize(new Date());
+    const firstExamDate = normalize(examData.schedule[0].examDate);
+    const lastDateRaw = normalize(examData.lastDate);
+
+    if (today < firstExamDate || today > lastDateRaw) {
+        return { isAvailable: false, data: [] };
+    }
+
+    const schedule = examData.schedule;
+
+    // Find today's exam
+    const todayExam = schedule.find(e =>
+        e.examDate !== "TBA" &&
+        normalize(e.parsedDate).getTime() === today.getTime()
+    );
+
+    // Find immediate next exam
+    const tomorrow = normalize(new Date());
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const nextExam = schedule.find(e =>
+        e.examDate !== "TBA" &&
+        normalize(e.parsedDate).getTime() === tomorrow.getTime()
+    );
+
+    let data = [];
+
+    if (todayExam) {
+        const examDateFormatted = formatDate(today);
+
+        data.push({
+            classes: [{
+                course: todayExam.courseName,
+                time: todayExam.examTime,
+                room: "exam"
+            }],
+            day: examDateFormatted.substring(0, 3)
+        });
+
+        // If today is last exam day → add next routine
+        if (today.getTime() === lastDateRaw.getTime()) {
+            const routine = JSON.parse(localStorage.getItem("routine")) || [];
+            const nextDay = getDateTime().nextDay.substring(0, 3);
+
+            const nextClass = routine.find(c => c.day === nextDay);
+            if (nextClass) data.push(nextClass);
+        }
+
+    } else if (nextExam) {
+        const tomorrow = normalize(new Date());
+        tomorrow.setDate(tomorrow.getDate() + 1);
+
+        if (normalize(nextExam.parsedDate).getTime() === tomorrow.getTime()) {
+            const examDateFormatted = formatDate(tomorrow);
+
+            data.push({
+                classes: [{
+                    course: nextExam.courseName,
+                    time: nextExam.examTime,
+                    room: "exam"
+                }],
+                day: examDateFormatted.substring(0, 3)
+            });
+        }
+    }
+
+    return { isAvailable: true, data };
+}

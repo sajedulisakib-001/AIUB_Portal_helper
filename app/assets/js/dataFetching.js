@@ -279,7 +279,7 @@ function getExamRoutine() {
 
                     const rows = doc.querySelectorAll("#routineBody tr");
                     
-                    const result = { term: "", schedule: [] };
+                    const result = { term: "", schedule: [], lastDate: null };
                     const nameOfTermAndYear = doc.querySelector("#main-content > div > h3")?.innerText.trim().split(" TERM EXAM SCHEDULE OF ");
                     const term = nameOfTermAndYear[0]?.split(" ").pop() || "";
                     const year = nameOfTermAndYear[1]?.split(" [")[0] || "";
@@ -293,10 +293,20 @@ function getExamRoutine() {
                             courseName: sctions[0],
                             section: sctions[1]?.[0],
                             examDate: cells[1]?.innerText.trim(),
+                            parsedDate: cells[1]?.innerText.trim() === "TBA" ? null : new Date(convertExamDate(cells[1]?.innerText.trim())),
                             examTime: cells[2]?.innerText.trim(),
                         });
                     });
+                    result.schedule = result.schedule.sort((a, b) => {
+                        if (!a.parsedDate) return 1;   
+                        if (!b.parsedDate) return -1;
+                        return a.parsedDate - b.parsedDate;
+                    });
                     
+                    for (let i = 0; i < result.schedule.length; i++) {
+                        if(result.schedule[i].parsedDate === null) break;
+                        result.lastDate = result.schedule[i].parsedDate;
+                    }
                     return result;
                 }
             }, (results) => {

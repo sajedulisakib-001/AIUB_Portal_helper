@@ -41,13 +41,18 @@ function getDateTime() {
  * @returns {string} The formatted date string in English (US) locale.
  */
 function formatDate(date) {
-    const options = {
-        weekday: "long",
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-    };
-    return new Intl.DateTimeFormat("en-US", options).format(date);
+    try {
+        const options = {
+            weekday: "long",
+            year: "numeric",
+            month: "long",
+            day: "numeric"
+        };
+        return new Intl.DateTimeFormat("en-US", options).format(date);
+    } catch (e) {
+        console.error("Error formatting date:", e);
+        return date.toDateString(); // Fallback to a simpler format
+    }
 }
 
 /**
@@ -91,4 +96,21 @@ async function isUpdateAvailable() {
         console.error("Error checking for update:", e);
     }
     return result;
+}
+
+/**
+ * Converts a date string from the format "DD/MON/YYYY" to "YYYY-MM-DD".
+ * @param {string} input - The date string to convert.
+ * @returns {string} The converted Exam date string.
+ */
+function convertExamDate(input) {
+    const [day, mon, year] = input.split("/");
+
+    const months = {
+        Jan: "01", Feb: "02", Mar: "03", Apr: "04",
+        May: "05", Jun: "06", Jul: "07", Aug: "08",
+        Sep: "09", Oct: "10", Nov: "11", Dec: "12"
+    };
+
+    return `${year}-${months[mon]}-${day}`;
 }
