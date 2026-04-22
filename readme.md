@@ -71,6 +71,7 @@ To enable captcha solving, you need an API key for the Gemini service. Add your 
 CourseChromeextaintion/
 ├── app/
 │   ├── assets/
+│   │   ├── css/
 │   │   ├── js/
 │   │   │   ├── lib/             # Shared utilities/helpers used across scripts
 │   │   │   ├── toInject/        # Content scripts injected into the portals targeted pages
