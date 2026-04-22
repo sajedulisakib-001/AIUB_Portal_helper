@@ -68,7 +68,9 @@ function saveSettingsInStorage() {
     if(username !== "") data.username = username;
     if(password !== "") data.password = password;
 
-    localStorage.setItem("settings", JSON.stringify(data));
+    chrome.storage.local.set({
+        settings: data
+    });
     chrome.storage.local.set({ settings: data}, () => {
 
     });
@@ -77,13 +79,13 @@ function saveSettingsInStorage() {
 
 /**
  * Displays previously saved settings in the settings form
- * Retrieves settings from localStorage and populates form fields
+ * Retrieves settings from Chrome Storage and populates form fields
  * Shows settings fields if auto-login is enabled
  * @function showSavedSettings
  * @returns {void}
  */
-function showSavedSettings() {
-    const settings = JSON.parse(localStorage.getItem("settings"));
+async function showSavedSettings() {
+    const settings = (await chrome.storage.local.get(["settings"])).settings || null;
     if (settings !== null) {
         document.getElementById("autoLogin").checked = settings.autoLogin;
         document.getElementById("apiKey").value = settings.apiKey;

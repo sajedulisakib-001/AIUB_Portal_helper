@@ -1,7 +1,7 @@
 
 /**
  * This script handles the loading and displaying of unlocked courses
- * It retrieves the list of unlocked courses from the server or localStorage
+ * It retrieves the list of unlocked courses from the server or Chrome Storage
  * and displays them in the UI.
  * It also manages the prerequisites and completed courses
  * to determine which courses are available for the user to take.
@@ -13,7 +13,7 @@
 
 /**
  * Loads and displays the list of unlocked courses.
- * If reload is false, loads from localStorage; otherwise, fetches fresh data.
+ * If reload is false, loads from Chrome Storage; otherwise, fetches fresh data.
  * @param {boolean} reload - Whether to reload data from the server.
  */
 async function loadUnlockedCourses(reload = false) {
@@ -22,8 +22,8 @@ async function loadUnlockedCourses(reload = false) {
     let program = null;
 
     if (!reload) {
-        completedInfo = JSON.parse(localStorage.getItem("completedInfo"));
-        unlockedCoursesList = JSON.parse(localStorage.getItem("unlockedCoursesList"));
+        completedInfo = (await chrome.storage.local.get(["completedInfo"])).completedInfo || null;
+        unlockedCoursesList = (await chrome.storage.local.get(["unlockedCoursesList"])).unlockedCoursesList || null;
         if (!unlockedCoursesList || !completedInfo) {
             showCourseListMessage("No data found! Please reload the page.");
             return;
@@ -37,7 +37,9 @@ async function loadUnlockedCourses(reload = false) {
         showCourseListMessage("Something went wrong! Please try again later.");
         return;
     }
-    localStorage.setItem("completedInfo", JSON.stringify(completedInfo));
+    chrome.storage.local.set({
+        completedInfo: completedInfo
+    });
     program = completedInfo.program;
 
     unlockedCoursesList = await getUnlockedCourseList(program, completedInfo.completedCourseList, completedInfo.craditCompleted);
@@ -45,7 +47,9 @@ async function loadUnlockedCourses(reload = false) {
         showCourseListMessage("Something went wrong! Please try again later.");
         return;
     }
-    localStorage.setItem("unlockedCoursesList", JSON.stringify(unlockedCoursesList));
+    chrome.storage.local.set({
+        unlockedCoursesList: unlockedCoursesList
+    });
     displayUnlockedCourseList(unlockedCoursesList, program);
 }
 

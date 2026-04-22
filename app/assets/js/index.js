@@ -1,5 +1,6 @@
-document.addEventListener("DOMContentLoaded", () => {
-    if(localStorage.length===0){
+document.addEventListener("DOMContentLoaded", async() => {
+    const isEmpty = Object.keys(await chrome.storage.local.get(null)).length === 0;
+    if(isEmpty){
         document.getElementById("init-data-load").classList.add("show");
         return;
     }
@@ -18,7 +19,8 @@ document.getElementById("showPopup").addEventListener("click", () => {
 document.getElementById("closePopup").addEventListener("click", () => {
     document.getElementById('popupBox').classList.remove('show');
 });
-
+/*
+*/
 document.getElementById("initDataLoadBtn").addEventListener("click",async ()=>{
     document.getElementById("init-data-load").classList.remove("show");
     document.getElementById("init-data-loading").classList.add("show");
@@ -27,12 +29,19 @@ document.getElementById("initDataLoadBtn").addEventListener("click",async ()=>{
     if(data.completedInfo.completedCourseList&&data.completedInfo.program&&data.completedInfo.craditCompleted){
         unlockedCourseList = await getUnlockedCourseList(data.completedInfo.program,data.completedInfo.completedCourseList,data.completedInfo.craditCompleted);
     };
-    localStorage.setItem("routine", JSON.stringify(data.routine));
-    localStorage.setItem("currentCourses", JSON.stringify(data.currentCourses));
-    localStorage.setItem("completedInfo", JSON.stringify(data.completedInfo));
-    localStorage.setItem("unlockedCoursesList",JSON.stringify(unlockedCourseList));
+    chrome.storage.local.set({
+        routine: data.routine,
+        currentCourses: data.currentCourses,
+        completedInfo: data.completedInfo,
+        unlockedCoursesList: unlockedCourseList
+    });
     console.log(data);
-    if(localStorage.getItem("routine") && localStorage.getItem("currentCourses") && localStorage.getItem("completedInfo") && localStorage.getItem("unlockedCoursesList")){
+    const routine = (await chrome.storage.local.get(["routine"])).routine || null;
+    const currentCourses = (await chrome.storage.local.get(["currentCourses"])).currentCourses || null;
+    const completedInfo = (await chrome.storage.local.get(["completedInfo"])).completedInfo || null;
+    const unlockedCoursesList = (await chrome.storage.local.get(["unlockedCoursesList"])).unlockedCoursesList || null;
+
+    if (routine && currentCourses && completedInfo && unlockedCoursesList) {
         document.getElementById("init-data-loading").classList.remove("show");
         loadHTML("show-page-content", "home");
         setupNavigation();

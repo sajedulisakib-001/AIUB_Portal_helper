@@ -3,12 +3,11 @@
  */
 (() => {
   let iscaptchaSolved = false;
-
   /**
    * Retrieves extension settings from chrome.storage.local asynchronously.
    * @returns {Promise<Object>} - Resolves to the settings object.
    */
-  const getSettingsAsync = () => {
+  const getSettingsAsync = async() => {
     return new Promise((resolve) => {
       chrome.storage.local.get(["settings"], (result) => {
         resolve(result.settings || {});
