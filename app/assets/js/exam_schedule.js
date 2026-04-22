@@ -1,7 +1,7 @@
 
 /**
  * Displays the exam schedule in the UI.
- * Loads from localStorage if not reloading, otherwise fetches new data and updates the table.
+ * Loads from Chrome Storage if not reloading, otherwise fetches new data and updates the table.
  * @param {boolean} reload - Whether to reload the schedule from the server.
  */
 async function displayExamSchedule(reload = false) {
@@ -30,7 +30,7 @@ async function displayExamSchedule(reload = false) {
     };
     tbody.innerHTML = "";
     if (!reload) {
-        schedule = localStorage.getItem("examSchedule");
+        schedule = (await chrome.storage.local.get(["examSchedule"])).examSchedule || null;
         if (schedule !== null) {
             show(JSON.parse(schedule));
             return;
@@ -43,12 +43,14 @@ async function displayExamSchedule(reload = false) {
         tbody.append(tr);
         return;
     }
-    localStorage.removeItem("examSchedule");
+    await chrome.storage.local.remove(["examSchedule"]);
     var newSchedule = await getExamRoutine();
     console.log(newSchedule);
     if (newSchedule !== null) {
         show(newSchedule);
-        localStorage.setItem("examSchedule", JSON.stringify(newSchedule));
+        chrome.storage.local.set({
+            examSchedule: newSchedule
+        });
     } else {
         const tr = document.createElement("tr");
         const td = document.createElement("td");
