@@ -3,8 +3,6 @@
 Aiub Portal Helper is a Chrome extension designed to assist AIUB students by automating tasks such as auto-login, fetching unlocked courses, displaying exam schedules, and more.
 
 ---
-## Last Update
-
 
 ## Features
 
