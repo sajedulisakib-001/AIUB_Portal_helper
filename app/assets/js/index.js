@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async() => {
     }
     
     loadHTML("show-page-content", "home");
-    setupNavigation();
+    await setupNavigation();
    
 });
 
@@ -35,7 +35,6 @@ document.getElementById("initDataLoadBtn").addEventListener("click",async ()=>{
         completedInfo: data.completedInfo,
         unlockedCoursesList: unlockedCourseList
     });
-    console.log(data);
     const routine = (await chrome.storage.local.get(["routine"])).routine || null;
     const currentCourses = (await chrome.storage.local.get(["currentCourses"])).currentCourses || null;
     const completedInfo = (await chrome.storage.local.get(["completedInfo"])).completedInfo || null;
@@ -44,7 +43,7 @@ document.getElementById("initDataLoadBtn").addEventListener("click",async ()=>{
     if (routine && currentCourses && completedInfo && unlockedCoursesList) {
         document.getElementById("init-data-loading").classList.remove("show");
         loadHTML("show-page-content", "home");
-        setupNavigation();
+        await setupNavigation();
     }else{
         document.getElementById("init-data-load").classList.remove("show");
         
@@ -92,7 +91,7 @@ function loadHTML(id, file) {
  * Handles click events for navigation items, loads the corresponding page,
  * and manages the active state of navigation items.
  */
-function setupNavigation() {
+async function setupNavigation() {
     document.getElementsByClassName("wrapper")[0].classList.add("show");
     const navItems = document.querySelectorAll(".nav-item");
     navItems.forEach(item => {
@@ -109,6 +108,28 @@ function setupNavigation() {
     // Set the default active navigation item
     const defaultItem = document.querySelector('.nav-item[data-page="home"]');
     if (defaultItem) defaultItem.classList.add('active');
+
+
+    try{
+        const u = (await chrome.storage.local.get(["updateUnlocked"])).updateUnlocked || false;
+        if(u){
+            const routine = (await chrome.storage.local.get(["routine"])).routine || null;
+            const currentCourses = (await chrome.storage.local.get(["currentCourses"])).currentCourses || null;
+            const completedInfo = (await chrome.storage.local.get(["completedInfo"])).completedInfo || null;
+            let unlockedCourseList = [];
+            if(completedInfo.completedCourseList&&completedInfo.program&&completedInfo.craditCompleted){
+                unlockedCourseList = await getUnlockedCourseList(completedInfo.program,completedInfo.completedCourseList,completedInfo.craditCompleted);
+            };
+            console.log("Updated Unlocked: ", unlockedCourseList);
+            await chrome.storage.local.set({
+                unlockedCoursesList: unlockedCourseList,
+                updateUnlocked: false,
+            });
+        }
+    }catch{
+        console.log("Error updating unlocked Courses");
+
+    }
 }
 
 
