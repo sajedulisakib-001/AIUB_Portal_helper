@@ -30,11 +30,13 @@ async function displayExamSchedule(reload = false) {
     };
     tbody.innerHTML = "";
     if (!reload) {
-        schedule = (await chrome.storage.local.get(["examSchedule"])).examSchedule || null;
+        const schedule = (await chrome.storage.local.get("examSchedule")).schedule || null;
         if (schedule !== null) {
-            show(JSON.parse(schedule));
+            console.log(schedule);
+            show(schedule);
             return;
         }
+        
         const tr = document.createElement("tr");
         const td = document.createElement("td");
         td.setAttribute("colspan", "3");

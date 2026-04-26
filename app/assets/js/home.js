@@ -116,9 +116,11 @@ async function reloadHomePage(reload = false) {
  */
 async function shouldShowTomorrowRoutine(hour, minute) {
   const settings = (await chrome.storage.local.get(["settings"])).settings || null;
+  
   if (settings === null) if (hour >= 16) return true;
   try {
-    const time = JSON.parse(settings).showTomorrowsRoutineAt;
+    const time = settings.showTomorrowsRoutineAt;
+    
     if ((time === null || time.hour === "Hour") && hour >= 16) {
       return true;
     } else if (time !== null) {
@@ -146,7 +148,7 @@ async function setCurrentDates() {
   const dateEl = document.getElementById("currentDate");
   const dateELNext = document.getElementById("currentDate-next");
   const dates = getDateTime();
-  const showTomorrowRoutine = shouldShowTomorrowRoutine(
+  const showTomorrowRoutine = await shouldShowTomorrowRoutine(
     dates.hours,
     dates.minutes,
   );
@@ -204,7 +206,7 @@ function showNoRoutineMessage() {
  * Displays the routine for today and, if applicable, for tomorrow.
  * @param {object} data - The routine data to display.
  */
-function showRoutine(data) {
+async function showRoutine(data) {
   const list = document.getElementById("routineList");
   if (!list) return;
   list.innerHTML = "";
@@ -213,7 +215,7 @@ function showRoutine(data) {
     return;
   }
   const dates = getDateTime();
-  if (shouldShowTomorrowRoutine(dates.hours, dates.minutes)) {
+  if (await shouldShowTomorrowRoutine(dates.hours, dates.minutes)) {
     displayRoutine(data, dates.nextDay, true);
     document.getElementById("routineList-next").style.removeProperty("display");
   }
