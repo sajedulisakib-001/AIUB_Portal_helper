@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Aiub Portal Helper",
-    "version": "2.0.0", 
+    "version": "2.1.0", 
     "description": "This is a simple Chrome extension for AIUB Students.",
     "update_url": "https://raw.githubusercontent.com/sajedulisakib-001/AIUB_Portal_helper/main/update/update.xml",
     "action": {
