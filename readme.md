@@ -22,7 +22,6 @@ Aiub Portal Helper is a Chrome extension designed to assist AIUB students by aut
 4. Click **Load unpacked** and select the project folder.
 
 ---
----
 
 ## Update
 
@@ -119,3 +118,8 @@ This project is licensed under the MIT License. See the `LICENSE` file for detai
 ## Contributing
 
 Contributions are welcome! Feel free to submit a pull request or open an issue for any bugs or feature requests.
+
+
+---
+## Note: 
+<sub>😶‍🌫️This README.md was generated using AI.</sub>
