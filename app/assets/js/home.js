@@ -248,7 +248,7 @@ function displayRoutine(data, date, next = false) {
       if (todaysClass["room"] === "exam") {
         subject.innerText = `${todaysClass["course"]}`;
       } else {
-        subject.innerHTML = `${todaysClass["course"]} <strong>Room: ${todaysClass["room"]}</strong>`;
+        subject.innerHTML = `${todaysClass["course"]} </br><strong>Room: ${todaysClass["room"]}</strong>`;
       }
 
       item.appendChild(time);
