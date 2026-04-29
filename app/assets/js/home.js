@@ -96,7 +96,7 @@ async function reloadHomePage(reload = false) {
 
   data = await getRoutine();
   if (data !== null) {
-    show({ isExamAvailable: false, routine: data.routine, lastExam });
+    show({ isExamAvailable: false, routine: data.routine, lastExam:data.lastExam });
     setCurrentDates();
     chrome.storage.local.set({
       routine: data.routine,
