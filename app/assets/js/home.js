@@ -96,7 +96,7 @@ async function reloadHomePage(reload = false) {
 
   data = await getRoutine();
   if (data !== null) {
-    show({ isExamAvailable: false, routine: data.routine, lastExam });
+    show({ isExamAvailable: false, routine: data.routine, lastExam:data.lastExam });
     setCurrentDates();
     chrome.storage.local.set({
       routine: data.routine,
@@ -248,7 +248,7 @@ function displayRoutine(data, date, next = false) {
       if (todaysClass["room"] === "exam") {
         subject.innerText = `${todaysClass["course"]}`;
       } else {
-        subject.innerHTML = `${todaysClass["course"]} <strong>Room: ${todaysClass["room"]}</strong>`;
+        subject.innerHTML = `${todaysClass["course"]} </br><strong>Room: ${todaysClass["room"]}</strong>`;
       }
 
       item.appendChild(time);

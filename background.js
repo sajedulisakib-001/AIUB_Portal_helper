@@ -7,8 +7,8 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         target: { tabId: tabId },
         files: ["app/assets/js/toInject/autologin.js",
             "app/assets/js/toInject/parseAllData.js",
-            "app/assets/js/toInject/autoupdate.js",
-            "app/assets/js/toInject/parseExamSchedule.js"
+            "app/assets/js/toInject/parseExamSchedule.js",
+            "app/assets/js/toInject/autoupdate.js"
             
         ],
       });

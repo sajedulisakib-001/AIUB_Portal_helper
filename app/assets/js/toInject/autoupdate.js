@@ -6,11 +6,15 @@
     const classScaduleTitle = await document.querySelector("#main-content .panel-heading h5").innerText;
     if(classScaduleTitle!=='Class Schedule') return;
     console.log("Trying to update data if Available!!!");
-    const newSchedule = await getExamRoutine();
-    if (newSchedule !== null) {
+    
+    const newExamSchedule = await parseExamSchadule();
+    console.log(newExamSchedule);
+    if (newExamSchedule.schedule.length!==0 ) {
         chrome.storage.local.set({
-            examSchedule: newSchedule
+            examSchedule: newExamSchedule
         });
+    }else{
+        console.log("No New exam Routine!!");
     }
     const routine = (await chrome.storage.local.get("routine")).routine||null;
     if(routine!==null){
