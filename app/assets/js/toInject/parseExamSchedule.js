@@ -61,9 +61,10 @@ async function parseExamSchadule(){
         return a.parsedDate - b.parsedDate;
     });
     
-    for (let i = 0; i < result.schedule.length; i++) {
-        if(result.schedule[i].parsedDate === null) break;
-        result.lastDate = result.schedule[i].parsedDate;
+    for (let i = result.schedule.length - 1; i >= 0; i--) {
+        if(result.schedule[i].parsedDate === null) continue;
+        result.lastDate = result.schedule[i].examDate;
+        break;
     }
     return result;
 }
