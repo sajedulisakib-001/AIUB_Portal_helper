@@ -53,7 +53,11 @@ async function displayExamSchedule(reload = false) {
 
     const schedule = (await chrome.storage.local.get("examSchedule")).examSchedule || null;
 
-    if (schedule === null) noRoutine("Please Reload the page to see the\nlatest exam schedule");
+    if (schedule === null) {
+      noRoutine("Please Reload the page to see the\nlatest exam schedule");
+      return;
+    }
+
 
     show(schedule);
 

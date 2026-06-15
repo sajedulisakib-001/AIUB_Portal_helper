@@ -37,7 +37,12 @@
     }
 
     await chrome.storage.local.set({
-        routine: data.routine,
+        routine: data.routine.map(day => ({
+          ...day,
+          classes: [...day.classes].sort(
+              (a, b) => _getMinutes(a.time) - _getMinutes(b.time)
+          )
+      })),
         currentCourses: data.currentCourses,
         completedInfo: data.completedInfo,
         
@@ -49,3 +54,22 @@
 
 })();
 
+
+function _getMinutes(timeStr) {
+    let start = timeStr.split(" - ")[0];
+    start = start.replace(/^[A-Za-z]{3}\s+/, "");
+
+    let hours, minutes;
+
+    if (/AM|PM/.test(start)) {
+        const [time, period] = start.split(" ");
+        [hours, minutes] = time.split(":").map(Number);
+
+        if (period === "PM" && hours !== 12) hours += 12;
+        if (period === "AM" && hours === 12) hours = 0;
+    } else {
+        [hours, minutes] = start.split(":").map(Number);
+    }
+
+    return hours * 60 + minutes;
+}

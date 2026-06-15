@@ -91,15 +91,20 @@ async function reloadHomePage(reload = false) {
     }
     return;
   }
-  chrome.storage.local.re
   await chrome.storage.local.remove(["routine", "currentCourses"]);
 
   data = await getRoutine();
+  const routine = data.routine.map(day => ({
+          ...day,
+          classes: [...day.classes].sort(
+              (a, b) => _getMinutes(a.time) - _getMinutes(b.time)
+          )
+      }));
   if (data !== null) {
-    show({ isExamAvailable: false, routine: data.routine, lastExam:data.lastExam });
+    show({ isExamAvailable: false, routine: routine, lastExam:data.lastExam });
     setCurrentDates();
     chrome.storage.local.set({
-      routine: data.routine,
+      routine: routine,
       currentCourses: data.currentCourses
     });
   } else {
@@ -417,4 +422,24 @@ async function isExamAvailable() {
   }
   
   return { isExamAvailable: true, routine: routine, lastExam };
+}
+
+
+function _getMinutes(timeStr) {
+    let start = timeStr.split(" - ")[0];
+    start = start.replace(/^[A-Za-z]{3}\s+/, "");
+
+    let hours, minutes;
+
+    if (/AM|PM/.test(start)) {
+        const [time, period] = start.split(" ");
+        [hours, minutes] = time.split(":").map(Number);
+
+        if (period === "PM" && hours !== 12) hours += 12;
+        if (period === "AM" && hours === 12) hours = 0;
+    } else {
+        [hours, minutes] = start.split(":").map(Number);
+    }
+
+    return hours * 60 + minutes;
 }
