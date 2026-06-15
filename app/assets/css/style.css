@@ -215,7 +215,7 @@ body {
 .course-title{
     font-size: 13px;
     color: #0d6efd;
-    text-align: center;
+    text-align: start;
 }
 /* Course list */
 #courseList {
