@@ -65,7 +65,7 @@ To enable captcha solving, you need an API key for the Gemini service. Add your 
 
 ## File Structure
 ```
-CourseChromeextaintion/
+AIUB_Portal_Helper/
 ├── app/
 │   ├── assets/
 │   │   ├── css/
