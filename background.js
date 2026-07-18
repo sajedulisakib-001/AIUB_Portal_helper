@@ -1,5 +1,3 @@
-
-
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   if (changeInfo.status === "complete" && tab.url) {
     try {
@@ -9,7 +7,6 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
             "app/assets/js/toInject/parseAllData.js",
             "app/assets/js/toInject/parseExamSchedule.js",
             "app/assets/js/toInject/autoupdate.js"
-            
         ],
       });
     } catch {
