@@ -66,5 +66,11 @@ async function parseExamSchadule(){
         result.lastDate = result.schedule[i].examDate;
         break;
     }
+    for(const schedule of result.schedule){
+        if(schedule.examDate !== "TBA"){
+            result.startDate = schedule.examDate;
+            break;
+        }
+    }
     return result;
 }
