@@ -113,38 +113,7 @@ async function reloadHomePage(reload = false) {
   }
 }
 
-// /**
-//  * Determines whether to show tomorrow's routine based on the current time and user settings.
-//  * @param {number} hour - Current hour.
-//  * @param {number} minute - Current minute.
-//  * @returns {boolean} - True if tomorrow's routine should be shown.
-//  */
-// async function shouldShowTomorrowRoutine(hour, minute) {
-//   const settings = (await chrome.storage.local.get(["settings"])).settings || null;
-//   if (settings === null) if (hour >= 16) return true;
-//   try {
-//     const time = settings.showTomorrowsRoutineAt;
-    
-//     if ((time === null || time.hour === "Hour") && hour >= 16) {
-//       return true;
-//     } else if (time !== null) {
-//       let h = parseInt(time.hour);
-//       if (time.ampm === "PM" && h !== 12) {
-//         h += 12;
-//       }
-//       console.log("Current time:", hour + ":" + minute);
-//       console.log("Show tomorrow's routine at:", h + ":" + time.minute);
-//       if (h === hour && parseInt(time.minute) <= minute) {
-//         return true;
-//       } else if (h < hour) {
-//         return true;
-//       }
-//     }
-//   } catch {
-//     if (hour >= 16) return true;
-//   }
-//   return false;
-// }
+
 /**
  * Determines whether to show tomorrow's routine based on the current time and user settings.
  * @param {number} hour - Current hour (0-23).
@@ -315,6 +284,7 @@ function displayRoutine(data, date, next = false) {
 
 async function isExamAvailable() {
   let lastExam = false;
+  
   let examData = null;
   try{
       examData = (await chrome.storage.local.get(["examSchedule"])).examSchedule || null;
@@ -331,8 +301,14 @@ async function isExamAvailable() {
     date.setHours(0, 0, 0, 0);
     return date;
   };
+
+
+
   const today = normalize(new Date());
-  const firstExamDate = normalize(examData.schedule[0].examDate);
+  const tomorrow = normalize(new Date());
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const firstExamDate = normalize(examData.startDate);
   const lastDateRaw = normalize(convertExamDate(examData.lastDate));
 
   //delete examScahedule from Chrome Storage if lastDate has passed 3 days ago.
@@ -344,14 +320,14 @@ async function isExamAvailable() {
     await chrome.storage.local.remove(["examSchedule"]);
     return { isExamAvailable: false, routine: [], lastExam: false };
   }
-
-  if (today < firstExamDate || today > lastDateRaw) {
-    
+  if((today < firstExamDate || today > lastDateRaw) && (firstExamDate.getTime() !== tomorrow.getTime())) {
     return { isExamAvailable: false, routine: [], lastExam: false };
   }
 
   const schedule = examData.schedule;
-  // Find today's exam (There can be multiple exams in a day, but we will show all of them in the routine)
+
+
+  // Find today's exam (There can be multiple exams in a day, and we will show all of them in the routine)
   const todayExam = schedule.filter(
     (e) =>
       e.examDate !== "TBA" &&
@@ -359,10 +335,7 @@ async function isExamAvailable() {
   );
   
   
-  // Find immediate next exam (There can be multiple exams in a day, but we will show all of them in the routine)
-  const tomorrow = normalize(new Date());
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
+  // Find immediate next exam (There can be multiple exams in a day, and we will show all of them in the routine)
   const nextExam = schedule.filter(
     (e) =>
       e.examDate !== "TBA" &&
