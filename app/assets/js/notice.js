@@ -10,41 +10,36 @@ async function setupNoticePage() {
 
   const container = document.getElementById("notice-container");
   const indicator = document.getElementById("indicator");
-  if(indicator)indicator.remove();
+  if (indicator) indicator.remove();
   container.innerHTML = "";
   const queue = [];
 
   data_notice.notice.forEach((notice) => {
-      const element = noticeView(notice);
+    const element = noticeView(notice);
 
-      if (notice.viewed) {
-          queue.push(element);
-      } else {
-          container.appendChild(element);
-      }
+    if (notice.viewed) {
+      queue.push(element);
+    } else {
+      container.appendChild(element);
+    }
   });
 
-  queue.forEach(item => {
-      container.appendChild(item);
+  queue.forEach((item) => {
+    container.appendChild(item);
   });
-
-  
 
   container.addEventListener("click", (e) => {
     const box = e.target.closest(".routine-box");
-
     if (!box) return;
 
     const id = Number(box.dataset.id);
 
+    const notice = data_notice.notice.find((notice) => notice.id === id);
 
-    const href = data_notice.notice.find(
-        notice => notice.id === id
-    )?.url;
+    if (!notice) return;
 
-    if(!href)return; 
-
-    markNoticeViewed(id,href);
+    if (!notice.viewed) markNoticeViewed(id, notice.url);
+    else chrome.tabs.create({url: notice.url});
   });
 }
 
@@ -73,7 +68,7 @@ function noticeView(n) {
   row.appendChild(descE);
 
   const mark = document.createElement("div");
-  mark.innerText = n.viewed ?"✅" : "⬜" ;
+  mark.innerText = n.viewed ? "✅" : "⬜";
 
   const col = document.createElement("div");
   col.classList.add("colum-notice");
@@ -109,12 +104,12 @@ async function markNoticeViewed(id, href) {
 
   notice.viewed = true;
 
-  chrome.storage.local.set({
+  await chrome.storage.local.set({
     data_notice,
   });
 
   chrome.tabs.create({
-     url: href
+    url: href,
   });
 
   // // Update only clicked item
