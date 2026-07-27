@@ -160,46 +160,49 @@ async function setupNavigation() {
 }
 
 /**
- * Fetches the latest notices from the server and synchronizes them with
- * the locally cached data stored in chrome.storage.local.
+ * Synchronizes locally cached notices with the latest data fetched from the server.
  *
- * If cached data already exists, only newly published notices are prepended
- * while the oldest notices are removed to keep the cache size fixed. Existing
- * notice objects are preserved so locally stored properties (e.g. `viewed`)
- * remain intact.
+ * If cached notice data exists, the function checks for newly published notices,
+ * preserves existing notice properties (such as `viewed`), prepends new notices,
+ * and removes the oldest entries to keep the cache limited to the latest 10 notices.
+ * The unread/new notice count is also updated while preventing invalid values.
  *
- * If no cached data exists, the complete notice list is stored.
+ * If no cached data exists, the fetched notice data is stored as the initial cache.
  */
 (async () => {
   const { data_notice } = await chrome.storage.local.get("data_notice");
     if (data_notice != null) {
-      const isExpired = new Date() > new Date(data_notice.next_parse);
+
+      const nextParseDate = new Date(new Date(data_notice.next_parse).getTime() + 10 * 60 * 1000);
+      const isExpired = new Date() > nextParseDate;
+
       if(!isExpired){
         showIndicator(data_notice.new_count);
         return;
       }
     }
       const data = await fetchNotices();
-
+      let newCount = 0;
       if (data !== null) {
-        data.new_count = 10;
         if (data_notice != null) {
-          const newCount = data.last_id - data_notice.last_id;
-
+          const storedNewCount = data_notice.new_count || 0;
+          const diff = Math.max(0, data.last_id - data_notice.last_id);
+          newCount = Math.min(diff + storedNewCount, 10);
+            
           if (newCount !== 0) {
             data_notice.notice.splice(10 - newCount, 10);
-            data_notice.unshift(...data.notice.slice(0, newCount));
-            data_notice.last_update = data.last_update;
-            data_notice.last_id = data.last_id;
-            data_notice.new_count = newCount;
-            chrome.storage.local.set({ data_notice: data_notice });
+            data_notice.notice.unshift(...data.notice.slice(0, newCount));
           }
-        } else {
-          data_notice = data;
+          data_notice.last_update = data.last_update;
+          data_notice.last_id = data.last_id;
+          data_notice.new_count = newCount;
           chrome.storage.local.set({ data_notice: data_notice });
+        } else {
+          newCount = 10;
+          chrome.storage.local.set({ data_notice: data });
         }
       }
-      showIndicator(data_notice.new_count);
+      showIndicator(newCount);
 })();
 
 /**
