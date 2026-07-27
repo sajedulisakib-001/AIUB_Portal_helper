@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   loadHTML("show-page-content", "home");
   await setupNavigation();
+  updateNotice();
 });
 
 document.getElementById("showPopup").addEventListener("click", () => {
@@ -169,7 +170,7 @@ async function setupNavigation() {
  *
  * If no cached data exists, the fetched notice data is stored as the initial cache.
  */
-(async () => {
+async function updateNotice() {
   const { data_notice } = await chrome.storage.local.get("data_notice");
     if (data_notice != null) {
 
@@ -203,7 +204,7 @@ async function setupNavigation() {
         }
       }
       showIndicator(newCount);
-})();
+}
 
 /**
  * Retrieves the latest notice data from the remote API.
