@@ -172,17 +172,20 @@ async function setupNavigation() {
  */
 async function updateNotice() {
   const { data_notice } = await chrome.storage.local.get("data_notice");
-    if (data_notice != null) {
+      if (data_notice != null) {
 
-      const nextParseDate = new Date(new Date(data_notice.next_parse).getTime() + 10 * 60 * 1000);
-      const isExpired = new Date() > nextParseDate;
+        const nextParseDate = new Date(new Date(data_notice.next_parse).getTime() + 10 * 60 * 1000);
+        const isExpired = new Date() > nextParseDate;
 
-      if(!isExpired){
-        showIndicator(data_notice.new_count);
-        return;
+        if(!isExpired){
+          showIndicator(data_notice.new_count);
+          return;
+        }
       }
-    }
       const data = await fetchNotices();
+
+      console.log(data);
+
       let newCount = 0;
       if (data !== null) {
         if (data_notice != null) {
@@ -195,6 +198,7 @@ async function updateNotice() {
             data_notice.notice.unshift(...data.notice.slice(0, newCount));
           }
           data_notice.last_update = data.last_update;
+          data_notice.next_parse = data.next_parse;
           data_notice.last_id = data.last_id;
           data_notice.new_count = newCount;
           chrome.storage.local.set({ data_notice: data_notice });
