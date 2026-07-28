@@ -214,7 +214,7 @@ async function updateNotice() {
  * Retrieves the latest notice data from the remote API.
  *
  * @returns {Promise<Object|null>}
- * A notice object containing the latest notices, last_id, and last_update,
+ * A notice object containing the latest notices, last_id, next_parse, and last_update,
  * or `null` if the request fails or the response cannot be parsed.
  */
 async function fetchNotices() {
