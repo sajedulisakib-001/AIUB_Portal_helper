@@ -7,7 +7,8 @@ chrome.runtime.onStartup.addListener(()=>{
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status !== "complete" || !tab.url) return;
-    if(!isUpdateFunctionCalled)updateNotice();
+    if (!isUpdateFunctionCalled) updateNotice();
+    else isUpdateFunctionCalled=false;
     try {
         await chrome.scripting.executeScript({
             target: { tabId },
@@ -51,11 +52,13 @@ async function updateNotice() {
 
     if (data_notice) {
         const nextParseDate = new Date(data_notice.next_parse);
-        nextParseDate.setMinutes(nextParseDate.getMinutes() + 10);
+        if (!isNaN(nextParseDate.getTime())) {
+            nextParseDate.setMinutes(nextParseDate.getMinutes() + 10);
 
-        if (new Date() <= nextParseDate) {
-            updateBadge(newCount);
-            return;
+            if (new Date() <= nextParseDate) {
+                updateBadge(newCount);
+                return;
+            }
         }
     }
 
