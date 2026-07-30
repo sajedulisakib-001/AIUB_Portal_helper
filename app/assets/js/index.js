@@ -8,7 +8,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   loadHTML("show-page-content", "home");
   await setupNavigation();
-  updateNotice();
+  // updateNotice();
+
+  showIndicator();
 });
 
 document.getElementById("showPopup").addEventListener("click", () => {
@@ -170,81 +172,100 @@ async function setupNavigation() {
  *
  * If no cached data exists, the fetched notice data is stored as the initial cache.
  */
-async function updateNotice() {
-  const { data_notice } = await chrome.storage.local.get("data_notice");
-      if (data_notice != null) {
+// async function updateNotice() {
+//   const { data_notice } = await chrome.storage.local.get("data_notice");
+//       if (data_notice != null) {
 
-        const nextParseDate = new Date(new Date(data_notice.next_parse).getTime() + 10 * 60 * 1000);
-        const isExpired = new Date() > nextParseDate;
+//         const nextParseDate = new Date(new Date(data_notice.next_parse).getTime() + 10 * 60 * 1000);
+//         const isExpired = new Date() > nextParseDate;
 
-        if(!isExpired){
-          showIndicator(data_notice.new_count);
-          return;
-        }
-      }
-      const data = await fetchNotices();
+//         if(!isExpired){
+//           showIndicator(data_notice.new_count);
+//           return;
+//         }
+//       }
+//       const data = await fetchNotices();
 
-      console.log(data);
+//       console.log(data);
 
-      let newCount = 0;
-      if (data !== null) {
-        if (data_notice != null) {
-          const storedNewCount = data_notice.new_count || 0;
-          const diff = Math.max(0, data.last_id - data_notice.last_id);
-          newCount = Math.min(diff + storedNewCount, 10);
+//       let newCount = 0;
+//       if (data !== null) {
+//         if (data_notice != null) {
+//           const storedNewCount = data_notice.new_count || 0;
+//           const diff = Math.max(0, data.last_id - data_notice.last_id);
+//           newCount = Math.min(diff + storedNewCount, 10);
             
-          if (newCount !== 0) {
-            data_notice.notice.splice(10 - newCount, 10);
-            data_notice.notice.unshift(...data.notice.slice(0, newCount));
-          }
-          data_notice.last_update = data.last_update;
-          data_notice.next_parse = data.next_parse;
-          data_notice.last_id = data.last_id;
-          data_notice.new_count = newCount;
-          chrome.storage.local.set({ data_notice: data_notice });
-        } else {
-          newCount = 10;
-          chrome.storage.local.set({ data_notice: data });
-        }
-      }
-      showIndicator(newCount);
-}
+//           if (newCount !== 0) {
+//             data_notice.notice.splice(10 - newCount, 10);
+//             data_notice.notice.unshift(...data.notice.slice(0, newCount));
+//           }
+//           data_notice.last_update = data.last_update;
+//           data_notice.next_parse = data.next_parse;
+//           data_notice.last_id = data.last_id;
+//           data_notice.new_count = newCount;
+//           chrome.storage.local.set({ data_notice: data_notice });
+//         } else {
+//           newCount = 10;
+//           chrome.storage.local.set({ data_notice: data });
+//         }
+//       }
+//       showIndicator(newCount);
+// }
 
-/**
- * Retrieves the latest notice data from the remote API.
- *
- * @returns {Promise<Object|null>}
- * A notice object containing the latest notices, last_id, next_parse, and last_update,
- * or `null` if the request fails or the response cannot be parsed.
- */
-async function fetchNotices() {
-  const API_URL = "https://24562381.wasmer.app/?action=get";
+// /**
+//  * Retrieves the latest notice data from the remote API.
+//  *
+//  * @returns {Promise<Object|null>}
+//  * A notice object containing the latest notices, last_id, next_parse, and last_update,
+//  * or `null` if the request fails or the response cannot be parsed.
+//  */
+// async function fetchNotices() {
+//   const API_URL = "https://24562381.wasmer.app/?action=get";
 
-  try {
-    const response = await fetch(API_URL, {
-      method: "GET",
-      headers: {
-        Accept: "application/json",
-      },
-    });
+//   try {
+//     const response = await fetch(API_URL, {
+//       method: "GET",
+//       headers: {
+//         Accept: "application/json",
+//       },
+//     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`HTTP Error: ${response.status}`);
+//     }
 
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error("Failed to fetch notices:", error);
-    return null;
-  }
-}
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     console.error("Failed to fetch notices:", error);
+//     return null;
+//   }
+// }
 
+// /**
+//  * Shows a notification indicator with the given notice count.
+//  * @param {number} count - Number of new notices to display.
+//  */
 /**
  * Shows a notification indicator with the given notice count.
  * @param {number} count - Number of new notices to display.
  */
-function showIndicator(count){
+// function showIndicator(count){
+//   if (count > 0) {
+//       const element = document.querySelector(`.nav-item[data-page="notice"]`);
+//       const indicator = document.createElement("div");
+//       indicator.innerText = count;
+//       indicator.classList.add("indicator");
+//       indicator.setAttribute("id","indicator");
+//       element.appendChild(indicator);
+//     }
+// }
+
+async function showIndicator(){
+  const { data_notice } = await chrome.storage.local.get("data_notice");
+  const count = data_notice.new_count ?? 0;
+  updateBadge(count);
+  console.log(data_notice);
   if (count > 0) {
       const element = document.querySelector(`.nav-item[data-page="notice"]`);
       const indicator = document.createElement("div");
@@ -253,4 +274,14 @@ function showIndicator(count){
       indicator.setAttribute("id","indicator");
       element.appendChild(indicator);
     }
+}
+
+function updateBadge(count) {
+    chrome.action.setBadgeText({
+        text: count > 0 ? String(count) : ""
+    });
+
+    chrome.action.setBadgeBackgroundColor({
+        color: "#d93025"
+    });
 }
