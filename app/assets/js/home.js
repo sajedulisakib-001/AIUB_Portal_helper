@@ -166,34 +166,42 @@ async function setCurrentDates() {
 
   dateEl.textContent = "Today : " + dates.today;
   document.getElementById("currentDate").style.display = "block";
-  const fetchedHolidays = await fetch("app/assets/json/holidays.json");
-  const holidays = await fetchedHolidays.json();
 
-  for (const holiday of holidays) {
-    const holidayDate = new Date(holiday.date);
-    if (formatDate(holidayDate) === dates.today.split(",")[1]) {
-      const holidayText = document.createElement("span");
-      const br = document.createElement("br");
-      dateEl.appendChild(br);
-      const style =
-        "color: #ff0000; font-weight: bold; margin-left: 5px; font-size: 0.8em;";
-      holidayText.style = style;
-      holidayText.textContent = `Possible Holiday - (${holiday.name})`;
-      dateEl.appendChild(holidayText);
-    } else if (
-      showTomorrowRoutine &&
-      formatDate(holidayDate).split(",")[1] == dates.nextDay.split(",")[1]
-    ) {
-      const holidayText = document.createElement("span");
-      const br = document.createElement("br");
-      dateELNext.appendChild(br);
-      const style =
-        "color: #ff0000; font-weight: bold; margin-left: 5px; font-size: 0.8em;";
-      holidayText.style = style;
-      holidayText.textContent = `Possible Holiday - (${holiday.name})`;
-      dateELNext.appendChild(holidayText);
+  const { holiday_data } = await chrome.storage.local.get("holiday_data");
+  if(holiday_data){
+    const holidays = holiday_data.holidays;
+    if(Array.isArray(holidays)){
+      for (const holiday of holidays) {
+        const holidayDate = new Date(holiday.date);
+        if (formatDate(holidayDate) === dates.today.split(",")[1]) {
+          showHoliday(dateEl, holiday);
+          if(!showTomorrowRoutine)return;
+        } else if (
+          showTomorrowRoutine &&
+          formatDate(holidayDate).split(",")[1] == dates.nextDay.split(",")[1]
+        ) {
+          showHoliday(dateELNext, holiday);
+        }
+      }
     }
   }
+}
+
+/**
+ * Displays a holiday notice inside the given container.
+ *
+ * @param {HTMLElement} container - Element where the holiday text will be added.
+ * @param {Object} holiday - The holiday data to display.
+ */
+function showHoliday(container, holiday) {
+    const holidayText = document.createElement("span");
+      const br = document.createElement("br");
+      container.appendChild(br);
+      const style =
+        "color: #ff0000; font-weight: bold; margin-left: 5px; font-size: 0.8em;";
+      holidayText.style = style;
+      holidayText.textContent = `Possible Holiday - (${holiday.name})`;
+      container.appendChild(holidayText);
 }
 
 /**
