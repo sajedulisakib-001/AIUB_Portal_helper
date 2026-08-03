@@ -114,3 +114,37 @@ function convertExamDate(input) {
 
     return `${year}-${months[mon]}-${day}`;
 }
+
+
+/**
+ * Fetch parsed data from the remote API based on the provided action.
+ *
+ * @async
+ * @param {string} action - The API action parameter used to determine which data to fetch.
+ * @returns {Promise<Object|null>} Returns the parsed JSON response on success, or null if the request fails.
+ *
+ * @example
+ * const notices = await fetchParsedData("notices");
+ */
+async function fetchParsedData(action) {
+    const API_URL = `https://24562381.wasmer.app/?action=${action}`;
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "GET",
+            headers: {
+                Accept: "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status}`);
+        }
+
+        return await response.json();
+
+    } catch (error) {
+        console.error("Failed to fetch parsed data:", error);
+        return null;
+    }
+}

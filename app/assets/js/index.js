@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   loadHTML("show-page-content", "home");
   await setupNavigation();
-
+  updateHoliday();
   showIndicator();
 });
 
@@ -203,3 +203,25 @@ function updateBadge(count) {
         color: "#d93025"
     });
 }
+
+
+async function updateHoliday(){
+    const { holiday_data } = await chrome.storage.local.get("holiday_data");
+    if (holiday_data) {
+        const nextParseDate = new Date(holiday_data.next_parse);
+        if (!isNaN(nextParseDate.getTime())) {
+            nextParseDate.setMinutes(nextParseDate.getMinutes() + 10);
+            if (new Date() <= nextParseDate) {
+                return;
+            }
+        }
+    }
+
+    const data = await fetchParsedData("holidays");
+
+    if (data) {
+        
+        await chrome.storage.local.set({ holiday_data: data });
+    }
+}
+
