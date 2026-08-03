@@ -171,7 +171,6 @@ async function showIndicator(){
   const { data_notice } = await chrome.storage.local.get("data_notice");
   const count = data_notice?.new_count ?? 0;
   updateBadge(count);
-  console.log(data_notice);
 
   const element = document.querySelector(`.nav-item[data-page="notice"]`);
   if (!element) return;
