@@ -5,12 +5,7 @@
 async function setUpHome() {
   setGreeting();
 
-  const reloadBtn = document.getElementById("reloadRoutine");
-
-  if (reloadBtn) {
-    reloadBtn.addEventListener("click", () => reloadHomePage(true));
-  }
-  reloadHomePage(false);
+  loadHomePage();
   const showUpdatePopUp = document.getElementById("showUpdatePopUp");
   showUpdatePopUp.addEventListener("click", () => {
     const popup = document.getElementById("updatePopUpBox");
@@ -54,65 +49,51 @@ function setGreeting() {
 }
 
 /**
- * Loads and displays the routine data. If reload is true, fetches new data from the server.
- * Otherwise, loads from Chrome Storage if available.
- * @param {boolean} reload - Whether to force reload the routine data.
+ * Loads and displays the routine data.
+ * If an exam is available, it shows a greeting message and the exam routine.
+ * If no routine data is found, it displays a message indicating that.
  */
-async function reloadHomePage(reload = false) {
+async function loadHomePage() {
   const show = async (data) => {
     await delay(500);
     showRoutine(data);
   };
-  if (!reload) {
-    const examData = await isExamAvailable();
-    
-    if (examData.isExamAvailable) {
-      setCurrentDates();
-      document.getElementById("homeTitle").style.display = "none";
-      const p1 = document.getElementById("lastUpdated");
-      p1.style.display = "block";
-      p1.textContent =
-        "Best of luck with your exams! Remember to take breaks and stay hydrated. You've got this! 💪";
-      if (examData.lastExam) {
-        p1.textContent =
-          "This is the last exam in your schedule. Best of luck! 🎉";
-      }
-      show(examData);
-      return;
-    }
+  const examData = await isExamAvailable();
 
-    let data = (await chrome.storage.local.get(["routine"])).routine || null;
-    if (data === null || data.length === 0) {
-      await delay(500);
-      showNoRoutineMessage();
-    } else {
-      setCurrentDates();
-      show({ isExamAvailable: false, routine: data, lastExam: false });
-    }
-    return;
+  if (examData.isExamAvailable) {
+    showGreeting(examData);
   }
-  await chrome.storage.local.remove(["routine", "currentCourses"]);
 
-  data = await getRoutine();
-  const routine = data.routine.map(day => ({
-          ...day,
-          classes: [...day.classes].sort(
-              (a, b) => _getMinutes(a.time) - _getMinutes(b.time)
-          )
-      }));
-  if (data !== null) {
-    show({ isExamAvailable: false, routine: routine, lastExam:data.lastExam });
-    setCurrentDates();
-    chrome.storage.local.set({
-      routine: routine,
-      currentCourses: data.currentCourses
-    });
-  } else {
+  let data = (await chrome.storage.local.get(["routine"])).routine || null;
+  if (data === null || data.length === 0) {
+    await delay(500);
     showNoRoutineMessage();
-    return;
+  } else {
+    setCurrentDates();
+    show({ isExamAvailable: false, routine: data, lastExam: false });
   }
 }
 
+
+/**
+ * Shows a greeting message on the page.
+ * If the current exam is the last exam, it displays a special message.
+ * Also updates the current date and displays the exam information.
+ * @param {*} examData Data containing exam schedule information.
+ */
+function showGreeting(examData) {
+    setCurrentDates();
+    document.getElementById("homeTitle").style.display = "none";
+    const p1 = document.getElementById("lastUpdated");
+    p1.style.display = "block";
+    p1.textContent =
+      "Best of luck with your exams! Remember to take breaks and stay hydrated. You've got this! 💪";
+    if (examData.lastExam) {
+      p1.textContent =
+        "This is the last exam in your schedule. Best of luck! 🎉";
+    }
+    show(examData);
+}
 
 /**
  * Determines whether to show tomorrow's routine based on the current time and user settings.
@@ -121,9 +102,9 @@ async function reloadHomePage(reload = false) {
  * @returns {boolean} - True if tomorrow's routine should be shown.
  */
 async function shouldShowTomorrowRoutine(hour, minute) {
-  const DEFAULT_HOUR = 16; 
+  const DEFAULT_HOUR = 16;
   const { settings } = await chrome.storage.local.get(["settings"]);
-  
+
   const timeCfg = settings?.showTomorrowsRoutineAt;
   if (!timeCfg || timeCfg.hour === "Hour") {
     return hour >= DEFAULT_HOUR;
@@ -132,15 +113,14 @@ async function shouldShowTomorrowRoutine(hour, minute) {
   try {
     let targetHour = parseInt(timeCfg.hour);
     const isPM = timeCfg.ampm === "PM";
-    
+
     if (isPM && targetHour !== 12) targetHour += 12;
     if (!isPM && targetHour === 12) targetHour = 0;
 
-    const currentTotalMinutes = (hour * 60) + minute;
-    const targetTotalMinutes = (targetHour * 60) + parseInt(timeCfg.minute || 0);
+    const currentTotalMinutes = hour * 60 + minute;
+    const targetTotalMinutes = targetHour * 60 + parseInt(timeCfg.minute || 0);
 
     return currentTotalMinutes >= targetTotalMinutes;
-    
   } catch (error) {
     console.error("Error calculating routine time:", error);
     return hour >= DEFAULT_HOUR;
@@ -168,14 +148,14 @@ async function setCurrentDates() {
   document.getElementById("currentDate").style.display = "block";
 
   const { holiday_data } = await chrome.storage.local.get("holiday_data");
-  if(holiday_data){
+  if (holiday_data) {
     const holidays = holiday_data.holidays;
-    if(Array.isArray(holidays)){
+    if (Array.isArray(holidays)) {
       for (const holiday of holidays) {
         const holidayDate = new Date(holiday.date);
         if (formatDate(holidayDate) === dates.today.split(",")[1]) {
           showHoliday(dateEl, holiday);
-          if(!showTomorrowRoutine)return;
+          if (!showTomorrowRoutine) return;
         } else if (
           showTomorrowRoutine &&
           formatDate(holidayDate).split(",")[1] == dates.nextDay.split(",")[1]
@@ -194,14 +174,14 @@ async function setCurrentDates() {
  * @param {Object} holiday - The holiday data to display.
  */
 function showHoliday(container, holiday) {
-    const holidayText = document.createElement("span");
-      const br = document.createElement("br");
-      container.appendChild(br);
-      const style =
-        "color: #ff0000; font-weight: bold; margin-left: 5px; font-size: 0.8em;";
-      holidayText.style = style;
-      holidayText.textContent = `Possible Holiday - (${holiday.name})`;
-      container.appendChild(holidayText);
+  const holidayText = document.createElement("span");
+  const br = document.createElement("br");
+  container.appendChild(br);
+  const style =
+    "color: #ff0000; font-weight: bold; margin-left: 5px; font-size: 0.8em;";
+  holidayText.style = style;
+  holidayText.textContent = `Possible Holiday - (${holiday.name})`;
+  container.appendChild(holidayText);
 }
 
 /**
@@ -231,7 +211,6 @@ async function showRoutine(data) {
   }
   const dates = getDateTime();
   if (await shouldShowTomorrowRoutine(dates.hours, dates.minutes)) {
-    
     displayRoutine(data, dates.nextDay, true);
     document.getElementById("routineList-next").style.removeProperty("display");
   }
@@ -292,16 +271,16 @@ function displayRoutine(data, date, next = false) {
 
 async function isExamAvailable() {
   let lastExam = false;
-  
+
   let examData = null;
-  try{
-      examData = (await chrome.storage.local.get(["examSchedule"])).examSchedule || null;
-      if (!examData || !examData.schedule?.length) {
-        return { isExamAvailable: false, routine: [], lastExam: false };
-      }
-  }catch(error){
-      
+  try {
+    examData =
+      (await chrome.storage.local.get(["examSchedule"])).examSchedule || null;
+    if (!examData || !examData.schedule?.length) {
       return { isExamAvailable: false, routine: [], lastExam: false };
+    }
+  } catch (error) {
+    return { isExamAvailable: false, routine: [], lastExam: false };
   }
 
   const normalize = (d) => {
@@ -309,8 +288,6 @@ async function isExamAvailable() {
     date.setHours(0, 0, 0, 0);
     return date;
   };
-
-
 
   const today = normalize(new Date());
   const tomorrow = normalize(new Date());
@@ -324,16 +301,17 @@ async function isExamAvailable() {
   cutoffDate.setDate(cutoffDate.getDate() - 3);
 
   if (lastDateRaw < cutoffDate) {
-    
     await chrome.storage.local.remove(["examSchedule"]);
     return { isExamAvailable: false, routine: [], lastExam: false };
   }
-  if((today < firstExamDate || today > lastDateRaw) && (firstExamDate.getTime() !== tomorrow.getTime())) {
+  if (
+    (today < firstExamDate || today > lastDateRaw) &&
+    firstExamDate.getTime() !== tomorrow.getTime()
+  ) {
     return { isExamAvailable: false, routine: [], lastExam: false };
   }
 
   const schedule = examData.schedule;
-
 
   // Find today's exam (There can be multiple exams in a day, and we will show all of them in the routine)
   const todayExam = schedule.filter(
@@ -341,19 +319,17 @@ async function isExamAvailable() {
       e.examDate !== "TBA" &&
       normalize(convertExamDate(e.examDate)).getTime() === today.getTime(),
   );
-  
-  
+
   // Find immediate next exam (There can be multiple exams in a day, and we will show all of them in the routine)
   const nextExam = schedule.filter(
     (e) =>
       e.examDate !== "TBA" &&
       normalize(convertExamDate(e.examDate)).getTime() === tomorrow.getTime(),
   );
-  
+
   let routine = [];
 
   if (todayExam) {
-    
     const examDateFormatted = formatDate(today);
     for (const exam of todayExam) {
       routine.push({
@@ -383,44 +359,45 @@ async function isExamAvailable() {
     tomorrow.setDate(tomorrow.getDate() + 1);
 
     for (const exam of nextExam) {
-      if (normalize(convertExamDate(exam.examDate)).getTime() === tomorrow.getTime()) {
-      const examDateFormatted = formatDate(tomorrow);
+      if (
+        normalize(convertExamDate(exam.examDate)).getTime() ===
+        tomorrow.getTime()
+      ) {
+        const examDateFormatted = formatDate(tomorrow);
 
-      routine.push({
-        classes: [
-          {
-            course: exam.courseName,
-            time: exam.examTime,
-            room: "exam",
-          },
-        ],
-        day: examDateFormatted.substring(0, 3),
-      });
+        routine.push({
+          classes: [
+            {
+              course: exam.courseName,
+              time: exam.examTime,
+              room: "exam",
+            },
+          ],
+          day: examDateFormatted.substring(0, 3),
+        });
+      }
     }
-    }
-  }else {
-    
+  } else {
   }
-  
+
   return { isExamAvailable: true, routine: routine, lastExam };
 }
 
-
 function _getMinutes(timeStr) {
-    let start = timeStr.split(" - ")[0];
-    start = start.replace(/^[A-Za-z]{3}\s+/, "");
+  let start = timeStr.split(" - ")[0];
+  start = start.replace(/^[A-Za-z]{3}\s+/, "");
 
-    let hours, minutes;
+  let hours, minutes;
 
-    if (/AM|PM/.test(start)) {
-        const [time, period] = start.split(" ");
-        [hours, minutes] = time.split(":").map(Number);
+  if (/AM|PM/.test(start)) {
+    const [time, period] = start.split(" ");
+    [hours, minutes] = time.split(":").map(Number);
 
-        if (period === "PM" && hours !== 12) hours += 12;
-        if (period === "AM" && hours === 12) hours = 0;
-    } else {
-        [hours, minutes] = start.split(":").map(Number);
-    }
+    if (period === "PM" && hours !== 12) hours += 12;
+    if (period === "AM" && hours === 12) hours = 0;
+  } else {
+    [hours, minutes] = start.split(":").map(Number);
+  }
 
-    return hours * 60 + minutes;
+  return hours * 60 + minutes;
 }
