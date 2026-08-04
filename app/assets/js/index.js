@@ -224,3 +224,18 @@ async function updateHoliday(){
     }
 }
 
+
+
+//TPE Skip Code
+
+// const getWeightedRandom = (p = 0.8) => (Math.random() < p ? 0 : 1);
+
+// // Select every question
+// document.querySelectorAll("form > ul > li > ul > li").forEach(question => {
+//     const radios = question.querySelectorAll("input[type='radio']");
+
+//     if (radios.length >= 2) {
+//         radios[getWeightedRandom()].click();
+//     }
+// });
+// document.getElementById("Comment").value="Best Teacher!"
