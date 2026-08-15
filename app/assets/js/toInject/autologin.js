@@ -4,15 +4,14 @@
 (() => {
   let iscaptchaSolved = false;
   /**
-   * Retrieves extension settings from chrome.storage.local asynchronously.
+   * Retrieves extension settings via the secure storage gateway
+   * (background.js), which scopes this request to this site's own
+   * data namespace only.
    * @returns {Promise<Object>} - Resolves to the settings object.
    */
-  const getSettingsAsync = async() => {
-    return new Promise((resolve) => {
-      chrome.storage.local.get(["settings"], (result) => {
-        resolve(result.settings || {});
-      });
-    });
+  const getSettingsAsync = async () => {
+    const result = await __secureStorageGet(["settings"]);
+    return result.settings || {};
   };
 
   const autoUserandPassFill = (settings) =>{

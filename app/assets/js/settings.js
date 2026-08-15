@@ -68,11 +68,8 @@ function saveSettingsInStorage() {
     if(username !== "") data.username = username;
     if(password !== "") data.password = password;
 
-    chrome.storage.local.set({
+    nsSet(CURRENT_SITE.config.namespace, {
         settings: data
-    });
-    chrome.storage.local.set({ settings: data}, () => {
-
     });
     return true;
 }
@@ -85,7 +82,7 @@ function saveSettingsInStorage() {
  * @returns {void}
  */
 async function showSavedSettings() {
-    const settings = (await chrome.storage.local.get(["settings"])).settings || null;
+    const settings = (await nsGet(CURRENT_SITE.config.namespace, ["settings"])).settings || null;
     if (settings !== null) {
         document.getElementById("autoLogin").checked = settings.autoLogin;
         document.getElementById("apiKey").value = settings.apiKey;

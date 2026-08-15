@@ -18,12 +18,8 @@
         <div class="page active" id="show-page-content">
 
         </div>
-        <div class="nav-bar">
-            <div class="nav-item" data-page="home">🏠 Home</div>
-            <div class="nav-item" data-page="other">📚 Others</div>
-            <div class="nav-item" data-page="notice">🗒️ Notice</div>
-            <div class="nav-item" data-page="settings">⚙️ Settings</div>
-            <!-- <div class="nav-item" data-page="profile">👤 Profile</div> -->
+        <div class="nav-bar" id="navBar">
+            <!-- Populated dynamically by index.js based on the current tab's site (see siteConfig.js) -->
         </div>
 
         <!-- Add Popup code here-->
@@ -59,6 +55,8 @@
         <h5>Loading...</h5>
     </div>
 
+    <script src="app/assets/js/siteConfig.js"></script>
+    <script src="app/assets/js/lib/dataStore.js"></script>
     <script src="app/assets/js/index.js"></script>
     <script src="app/assets/js/home.js"></script>
     <script src="app/assets/js/other.js"></script>

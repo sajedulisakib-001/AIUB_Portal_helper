@@ -51,7 +51,7 @@ async function displayExamSchedule(reload = false) {
 
   if (!reload) {
 
-    const schedule = (await chrome.storage.local.get("examSchedule")).examSchedule || null;
+    const schedule = (await nsGet(CURRENT_SITE.config.namespace, ["examSchedule"])).examSchedule || null;
 
     if (schedule === null) {
       noRoutine("Please Reload the page to see the\nlatest exam schedule");
@@ -63,12 +63,12 @@ async function displayExamSchedule(reload = false) {
 
   } else {
     
-    await chrome.storage.local.remove(["examSchedule"]);
+    await nsRemove(CURRENT_SITE.config.namespace, ["examSchedule"]);
     var newSchedule = await getExamRoutine();
 
     if (newSchedule !== null && newSchedule.schedule.length !== 0) {
       show(newSchedule);
-      chrome.storage.local.set({
+      nsSet(CURRENT_SITE.config.namespace, {
         examSchedule: newSchedule,
       });
     } else noRoutine("No Exam Found!");

@@ -22,8 +22,8 @@ async function loadUnlockedCourses(reload = false) {
     let program = null;
 
     if (!reload) {
-        completedInfo = (await chrome.storage.local.get(["completedInfo"])).completedInfo || null;
-        unlockedCoursesList = (await chrome.storage.local.get(["unlockedCoursesList"])).unlockedCoursesList || null;
+        completedInfo = (await nsGet(CURRENT_SITE.config.namespace, ["completedInfo"])).completedInfo || null;
+        unlockedCoursesList = (await nsGet(CURRENT_SITE.config.namespace, ["unlockedCoursesList"])).unlockedCoursesList || null;
         if (!unlockedCoursesList || !completedInfo) {
             showCourseListMessage("No data found! Please reload the page.");
             return;
@@ -37,7 +37,7 @@ async function loadUnlockedCourses(reload = false) {
         showCourseListMessage("Something went wrong! Please try again later.");
         return;
     }
-    chrome.storage.local.set({
+    nsSet(CURRENT_SITE.config.namespace, {
         completedInfo: completedInfo
     });
     program = completedInfo.program;
@@ -47,7 +47,7 @@ async function loadUnlockedCourses(reload = false) {
         showCourseListMessage("Something went wrong! Please try again later.");
         return;
     }
-    chrome.storage.local.set({
+    nsSet(CURRENT_SITE.config.namespace, {
         unlockedCoursesList: unlockedCoursesList
     });
     displayUnlockedCourseList(unlockedCoursesList, program);
