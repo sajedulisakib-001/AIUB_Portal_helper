@@ -1,25 +1,12 @@
-// Set by initSite() on load; other popup scripts (home.js, settings.js, ...)
-// read this to know which storage namespace they are allowed to use.
-let CURRENT_SITE = null;
-
 document.addEventListener("DOMContentLoaded", async () => {
-  CURRENT_SITE = await getActiveTabSite();
-
-  if (!CURRENT_SITE) {
-    showUnsupportedSiteMessage();
-    return;
-  }
-
-  const { namespace, defaultPage } = CURRENT_SITE.config;
-  const hasData = await namespaceHasCoreData(namespace);
-
-  if (!hasData) {
+  const isEmpty =
+    Object.keys(await chrome.storage.local.get(null)).length === 0;
+  if (isEmpty) {
     document.getElementById("init-data-load").classList.add("show");
     return;
   }
 
-  buildNavBar(CURRENT_SITE.config);
-  loadHTML("show-page-content", defaultPage);
+  loadHTML("show-page-content", "home");
   await setupNavigation();
   updateHoliday();
   showIndicator();
@@ -34,7 +21,8 @@ document.getElementById("showPopup").addEventListener("click", () => {
 document.getElementById("closePopup").addEventListener("click", () => {
   document.getElementById("popupBox").classList.remove("show");
 });
-
+/*
+ */
 document
   .getElementById("initDataLoadBtn")
   .addEventListener("click", async () => {
@@ -53,88 +41,31 @@ document
         data.completedInfo.craditCompleted,
       );
     }
-    const namespace = CURRENT_SITE.config.namespace;
-    await nsSet(namespace, {
+    chrome.storage.local.set({
       routine: data.routine,
       currentCourses: data.currentCourses,
       completedInfo: data.completedInfo,
       unlockedCoursesList: unlockedCourseList,
     });
-    const routine = (await nsGet(namespace, ["routine"])).routine || null;
+    const routine =
+      (await chrome.storage.local.get(["routine"])).routine || null;
     const currentCourses =
-      (await nsGet(namespace, ["currentCourses"])).currentCourses || null;
-    const completedInfo =
-      (await nsGet(namespace, ["completedInfo"])).completedInfo || null;
-    const unlockedCoursesList =
-      (await nsGet(namespace, ["unlockedCoursesList"])).unlockedCoursesList ||
+      (await chrome.storage.local.get(["currentCourses"])).currentCourses ||
       null;
+    const completedInfo =
+      (await chrome.storage.local.get(["completedInfo"])).completedInfo || null;
+    const unlockedCoursesList =
+      (await chrome.storage.local.get(["unlockedCoursesList"]))
+        .unlockedCoursesList || null;
 
     if (routine && currentCourses && completedInfo && unlockedCoursesList) {
       document.getElementById("init-data-loading").classList.remove("show");
-      buildNavBar(CURRENT_SITE.config);
-      loadHTML("show-page-content", CURRENT_SITE.config.defaultPage);
+      loadHTML("show-page-content", "home");
       await setupNavigation();
     } else {
       document.getElementById("init-data-load").classList.remove("show");
     }
   });
-
-/**
- * Determines which configured site (see siteConfig.js) the currently
- * active browser tab belongs to. Returns null when the active tab
- * isn't one of this extension's supported tools.
- * @returns {Promise<{hostname:string, config:object}|null>}
- */
-async function getActiveTabSite() {
-  return new Promise((resolve) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const tab = tabs && tabs[0];
-      resolve(resolveSiteFromUrl(tab?.url));
-    });
-  });
-}
-
-/**
- * A namespace is considered "initialized" once it holds at least one
- * of its core keys. Used to decide whether to show the first-run
- * "Load Data" screen.
- */
-async function namespaceHasCoreData(namespace) {
-  const stored = await chrome.storage.local.get(null);
-  const prefix = `${SITE_STORAGE_PREFIX}${namespace}__`;
-  return Object.keys(stored).some((k) => k.startsWith(prefix));
-}
-
-/**
- * Shows a friendly fallback when the popup is opened while the active
- * tab isn't one of the extension's supported sites.
- */
-function showUnsupportedSiteMessage() {
-  const container = document.getElementById("show-page-content");
-  container.innerHTML = `
-    <div class="header">
-      <h2>👋 Hi there</h2>
-      <p class="text-muted">This tool works on supported portals only. Open a supported site's tab and reopen this popup.</p>
-    </div>`;
-  container.classList.add("active");
-  document.getElementById("navBar").innerHTML = "";
-}
-
-/**
- * Builds the nav bar for whichever site is currently active, using
- * that site's navItems from siteConfig.js.
- */
-function buildNavBar(siteConfigEntry) {
-  const navBar = document.getElementById("navBar");
-  navBar.innerHTML = "";
-  siteConfigEntry.navItems.forEach((item, i) => {
-    const el = document.createElement("div");
-    el.className = "nav-item" + (i === 0 ? " active" : "");
-    el.setAttribute("data-page", item.page);
-    el.innerText = item.label;
-    navBar.appendChild(el);
-  });
-}
 
 /**
  * Loads HTML content into a specified container and initializes page-specific scripts.
@@ -190,16 +121,23 @@ async function setupNavigation() {
     });
   });
 
-  const namespace = CURRENT_SITE.config.namespace;
+  // Set the default active navigation item
+  const defaultItem = document.querySelector('.nav-item[data-page="home"]');
+  if (defaultItem) defaultItem.classList.add("active");
 
   try {
-    const u = (await nsGet(namespace, ["updateUnlocked"])).updateUnlocked || false;
+    const u =
+      (await chrome.storage.local.get(["updateUnlocked"])).updateUnlocked ||
+      false;
     if (u) {
-      const routine = (await nsGet(namespace, ["routine"])).routine || null;
+      const routine =
+        (await chrome.storage.local.get(["routine"])).routine || null;
       const currentCourses =
-        (await nsGet(namespace, ["currentCourses"])).currentCourses || null;
+        (await chrome.storage.local.get(["currentCourses"])).currentCourses ||
+        null;
       const completedInfo =
-        (await nsGet(namespace, ["completedInfo"])).completedInfo || null;
+        (await chrome.storage.local.get(["completedInfo"])).completedInfo ||
+        null;
       let unlockedCourseList = [];
       if (
         completedInfo.completedCourseList &&
@@ -213,7 +151,7 @@ async function setupNavigation() {
         );
       }
       console.log("Updated Unlocked: ", unlockedCourseList);
-      await nsSet(namespace, {
+      await chrome.storage.local.set({
         unlockedCoursesList: unlockedCourseList,
         updateUnlocked: false,
       });
@@ -223,13 +161,13 @@ async function setupNavigation() {
   }
 }
 
+
+
 /**
  * Reads notice metadata from local storage, updates the browser action badge,
  * and renders or removes the notice count indicator in the navigation.
- * data_notice is a shared/global feature (not tied to any single site),
- * so it intentionally lives outside the per-site namespaces.
  */
-async function showIndicator() {
+async function showIndicator(){
   const { data_notice } = await chrome.storage.local.get("data_notice");
   const count = data_notice?.new_count ?? 0;
   updateBadge(count);
@@ -256,33 +194,37 @@ async function showIndicator() {
  * @param {number} count - The number of unread notices to display.
  */
 function updateBadge(count) {
-  chrome.action.setBadgeText({
-    text: count > 0 ? String(count) : "",
-  });
+    chrome.action.setBadgeText({
+        text: count > 0 ? String(count) : ""
+    });
 
-  chrome.action.setBadgeBackgroundColor({
-    color: "#d93025",
-  });
+    chrome.action.setBadgeBackgroundColor({
+        color: "#d93025"
+    });
 }
 
-async function updateHoliday() {
-  const { holiday_data } = await chrome.storage.local.get("holiday_data");
-  if (holiday_data) {
-    const nextParseDate = new Date(holiday_data.next_parse);
-    if (!isNaN(nextParseDate.getTime())) {
-      nextParseDate.setMinutes(nextParseDate.getMinutes() + 10);
-      if (new Date() <= nextParseDate) {
-        return;
-      }
+
+async function updateHoliday(){
+    const { holiday_data } = await chrome.storage.local.get("holiday_data");
+    if (holiday_data) {
+        const nextParseDate = new Date(holiday_data.next_parse);
+        if (!isNaN(nextParseDate.getTime())) {
+            nextParseDate.setMinutes(nextParseDate.getMinutes() + 10);
+            if (new Date() <= nextParseDate) {
+                return;
+            }
+        }
     }
-  }
 
-  const data = await fetchParsedData("holidays");
+    const data = await fetchParsedData("holidays");
 
-  if (data) {
-    await chrome.storage.local.set({ holiday_data: data });
-  }
+    if (data) {
+        
+        await chrome.storage.local.set({ holiday_data: data });
+    }
 }
+
+
 
 //TPE Skip Code
 

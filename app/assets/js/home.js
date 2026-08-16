@@ -64,7 +64,7 @@ async function loadHomePage() {
     showGreeting(examData);
   }
 
-  let data = (await nsGet(CURRENT_SITE.config.namespace, ["routine"])).routine || null;
+  let data = (await chrome.storage.local.get(["routine"])).routine || null;
   if (data === null || data.length === 0) {
     await delay(500);
     showNoRoutineMessage();
@@ -103,7 +103,7 @@ function showGreeting(examData) {
  */
 async function shouldShowTomorrowRoutine(hour, minute) {
   const DEFAULT_HOUR = 16;
-  const { settings } = await nsGet(CURRENT_SITE.config.namespace, ["settings"]);
+  const { settings } = await chrome.storage.local.get(["settings"]);
 
   const timeCfg = settings?.showTomorrowsRoutineAt;
   if (!timeCfg || timeCfg.hour === "Hour") {
@@ -147,7 +147,6 @@ async function setCurrentDates() {
   dateEl.textContent = "Today : " + dates.today;
   document.getElementById("currentDate").style.display = "block";
 
-  // holiday_data is a shared/global (non-site-specific) cache, not part of any site namespace.
   const { holiday_data } = await chrome.storage.local.get("holiday_data");
   if (holiday_data) {
     const holidays = holiday_data.holidays;
@@ -276,7 +275,7 @@ async function isExamAvailable() {
   let examData = null;
   try {
     examData =
-      (await nsGet(CURRENT_SITE.config.namespace, ["examSchedule"])).examSchedule || null;
+      (await chrome.storage.local.get(["examSchedule"])).examSchedule || null;
     if (!examData || !examData.schedule?.length) {
       return { isExamAvailable: false, routine: [], lastExam: false };
     }
@@ -302,7 +301,7 @@ async function isExamAvailable() {
   cutoffDate.setDate(cutoffDate.getDate() - 3);
 
   if (lastDateRaw < cutoffDate) {
-    await nsRemove(CURRENT_SITE.config.namespace, ["examSchedule"]);
+    await chrome.storage.local.remove(["examSchedule"]);
     return { isExamAvailable: false, routine: [], lastExam: false };
   }
   if (
@@ -349,7 +348,7 @@ async function isExamAvailable() {
 
     if (formatDate(today) === formatDate(lastDateRaw)) {
       lastExam = true;
-      const r = (await nsGet(CURRENT_SITE.config.namespace, ["routine"])).routine || [];
+      const r = (await chrome.storage.local.get(["routine"])).routine || [];
       const nextDay = getDateTime().nextDay.substring(0, 3);
       const nextClass = r.find((c) => c.day === nextDay);
       if (nextClass) routine.push(nextClass);

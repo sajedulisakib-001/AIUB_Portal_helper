@@ -10,13 +10,13 @@
     const newExamSchedule = await parseExamSchadule();
     console.log(newExamSchedule);
     if (newExamSchedule.schedule.length!==0 ) {
-        __secureStorageSet({
+        chrome.storage.local.set({
             examSchedule: newExamSchedule
         });
     }else{
         console.log("No New exam Routine!!");
     }
-    const routine = (await __secureStorageGet(["routine"])).routine||null;
+    const routine = (await chrome.storage.local.get("routine")).routine||null;
     if(routine!==null){
         const course = routine[0].classes[0].course;
         const courses = Array.from(
@@ -36,7 +36,7 @@
         return;
     }
 
-    await __secureStorageSet({
+    await chrome.storage.local.set({
         routine: data.routine.map(day => ({
           ...day,
           classes: [...day.classes].sort(
@@ -47,7 +47,7 @@
         completedInfo: data.completedInfo,
         
     });
-    await __secureStorageSet({
+    await chrome.storage.local.set({
       updateUnlocked: true,
     });
     console.log("Auto Update Finished!!!!");
