@@ -23,7 +23,7 @@
         "storage"
     ],
     "host_permissions": [
-        "*://portal.aiub.edu/*"
+        "<all_urls>"
     ],
     "web_accessible_resources": [
         {
@@ -36,5 +36,8 @@
                 "*://portal.aiub.edu/*"
             ]
         }
-    ]
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self';"
+    }
 }

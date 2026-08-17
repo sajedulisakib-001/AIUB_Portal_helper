@@ -1,0 +1,12 @@
+{
+    "name": "GeoGebra Graph Points to Gult Code",
+    "description": "This tool helps you to generate OpenGL glut code from Ploted Graph",
+    "version": "1.0.0",
+    "author": "Sajedul Islam Sakib",
+    "license": "GPL-3.0",
+    "homepage": "https://www.geogebra.org/classic",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sajedulisakib-001/"
+    }    
+}

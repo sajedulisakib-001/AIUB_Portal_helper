@@ -92,6 +92,8 @@ function loadHTML(id, file) {
           setupSettingsPage();
         } else if (file === "notice") {
           setupNoticePage();
+        }else if(file ==="tools"){
+          setupToolsMenu();
         }
 
         setTimeout(() => {

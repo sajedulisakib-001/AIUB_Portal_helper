@@ -9,6 +9,13 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (changeInfo.status !== "complete" || !tab.url) return;
     if (!isUpdateFunctionCalled) updateNotice();
     else isUpdateFunctionCalled=false;
+
+    // host_permissions is now "<all_urls>" (needed so individual tools can
+    // reach whichever site they target), so this is no longer implicitly
+    // blocked by Chrome on non-portal tabs. Guard it explicitly instead —
+    // the portal content scripts must never run anywhere else.
+    if (!isAiubPortalUrl(tab.url)) return;
+
     try {
         await chrome.scripting.executeScript({
             target: { tabId },
@@ -131,6 +138,22 @@ async function fetchNotices() {
  *
  * @param {number} count - Number of unread notices.
  */
+/**
+ * Whether a URL belongs to the AIUB portal.
+ * Used to keep automatic content-script injection scoped to the portal only,
+ * now that host_permissions covers all hosts.
+ *
+ * @param {string} url
+ * @returns {boolean}
+ */
+function isAiubPortalUrl(url) {
+    try {
+        return new URL(url).host === "portal.aiub.edu";
+    } catch {
+        return false;
+    }
+}
+
 function updateBadge(count) {
     chrome.action.setBadgeText({
         text: count > 0 ? String(count) : "",

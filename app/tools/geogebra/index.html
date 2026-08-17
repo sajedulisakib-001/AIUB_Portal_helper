@@ -1,0 +1,75 @@
+<div id="tools-contents" class="fancy-scrollbar">
+    <div class="test-wrap">
+
+        <section class="hero">
+            <div class="badge">
+                <span></span>
+                System Online
+            </div>
+
+            <h1>Tools Playground.</h1>
+
+            <p>
+                A clean responsive testing environment with glassmorphism,
+                ambient gradients, interactive cards, and a futuristic dashboard feel.
+            </p>
+
+            <div class="actions">
+                <button class="btn btn-primary">Launch Tool</button>
+                <button class="btn btn-secondary">Explore Features</button>
+            </div>
+        </section>
+
+        <section class="stats">
+            <div class="card">
+                <div class="icon">⚡</div>
+                <strong>99.9%</strong>
+                <small>Performance Score</small>
+            </div>
+
+            <div class="card">
+                <div class="icon">◈</div>
+                <strong>24</strong>
+                <small>Available Tools</small>
+            </div>
+
+            <div class="card">
+                <div class="icon">⌁</div>
+                <strong>0.02s</strong>
+                <small>Average Response</small>
+            </div>
+        </section>
+
+        <section class="test-panel">
+            <div class="panel-title">
+                <h2>Component Tester</h2>
+                <span class="status">READY</span>
+            </div>
+
+            <div class="input-row">
+                <input
+                    class="input"
+                    type="text"
+                    placeholder="Type something to test..."
+                >
+
+                <button class="btn btn-primary">
+                    Test
+                </button>
+            </div>
+        </section>
+
+        <div class="footer-line">
+            Responsive • Lightweight • No JavaScript • CSS only
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const launchButton = document.querySelector(".btn-primary");
+
+    launchButton.addEventListener("click", () => {
+        alert("🚀 Tool launched successfully!");
+    });
+</script>
