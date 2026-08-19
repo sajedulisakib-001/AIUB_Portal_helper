@@ -15,7 +15,8 @@
         "default_title": "Aiub Portal Helper"
     },
     "background": {
-        "service_worker": "background.js"
+        "service_worker": "background.js",
+        "type": "module"
     },
     "permissions": [
         "scripting",

@@ -706,3 +706,22 @@ body {
   font-size: 10px;
   font-weight: bold;
 }
+
+#tools-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* prevents a flex child from growing past its parent */
+}
+
+#tools-contents {
+    flex: 1;
+    min-height: 0;
+}
+
+#tools-contents iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}

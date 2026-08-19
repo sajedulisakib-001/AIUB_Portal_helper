@@ -1,4 +1,9 @@
+importScripts("app/assets/js/lib/tools_integrity_checker.js");
+
+
 let isUpdateFunctionCalled = false;
+
+
 
 chrome.runtime.onStartup.addListener(()=>{
   isUpdateFunctionCalled = true;
@@ -6,6 +11,7 @@ chrome.runtime.onStartup.addListener(()=>{
 });
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    validateFile("app/tools/geogebra/script.js");
     if (changeInfo.status !== "complete" || !tab.url) return;
     if (!isUpdateFunctionCalled) updateNotice();
     else isUpdateFunctionCalled=false;
@@ -140,3 +146,5 @@ function updateBadge(count) {
         color: "#d93025",
     });
 }
+
+
