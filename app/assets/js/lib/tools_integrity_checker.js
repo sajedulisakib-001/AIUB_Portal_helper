@@ -66,3 +66,5 @@ async function validateFile(filePath) {
         return false;
     }
 }
+
+export { calculateSHA256, getServerHash, validateFile };

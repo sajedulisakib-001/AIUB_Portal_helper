@@ -1,4 +1,4 @@
-importScripts("app/assets/js/lib/tools_integrity_checker.js");
+import { validateFile } from "./app/assets/js/lib/tools_integrity_checker.js";
 
 
 let isUpdateFunctionCalled = false;
