@@ -1,4 +1,39 @@
 
-<div id="geogebra">
-        Hello Sakib!
-</div>
+<div class="t-container">
+    <div class="t-header">
+      <h2>GeoGebra Point Extractor</h2>
+      <button id="t-howToUseBtn" type="button" class="t-secondary small">How to Use</button>
+    </div>
+
+    <div class="t-tabs">
+      <button id="t-tabExtractBtn" type="button" class="t-tab active">Extract Points</button>
+      <button id="t-tabColorBtn" type="button" class="t-tab">Color Picker</button>
+    </div>
+
+    <!-- PAGE 1: Extract Points -->
+    <div id="t-pageExtract" class="t-page">
+      <div class="t-card">
+        <label for="skippedPoints">Skipped points</label>
+        <input id="t-skippedPoints" type="text" value="X,Y,X1,Y1">
+      </div>
+
+      <div class="t-card">
+        <label for="output">Output</label>
+        <textarea id="t-output" placeholder="Coordinates will appear here..." readonly></textarea>
+
+        <div class="t-btnRow">
+          <button id="t-getData">Get Data</button>
+          <button id="t-copyBtn" class="t-secondary">Copy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: Color Picker -->
+    <div id="t-pageColor" class="t-page hidden">
+      <div class="t-card center">
+        
+      </div>
+    </div>
+
+    <div id="t-status"></div>
+  </div>

@@ -114,7 +114,8 @@ async function setupToolsMenu() {
         }
 
         // Load tool JavaScript
-        if (toolMeta.run) {
+        if (toolMeta.actions?.run) {
+          await delay(50);
           try {
             const module = await import(
               chrome.runtime.getURL(`app/tools/${toolName}/script.js`)
@@ -122,7 +123,7 @@ async function setupToolsMenu() {
 
             // Make sure tool() exists
             if (typeof module.tool === "function") {
-              await module.tool();
+              await module.tool(`app/tools/${toolName}/`);
             } else {
               console.error(`${toolName}/script.js does not export tool()`);
             }
