@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", async () => {
   const isEmpty =
     Object.keys(await chrome.storage.local.get(null)).length === 0;
@@ -6,11 +5,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("init-data-load").classList.add("show");
     return;
   }
+  const { ["tools-metadata"]: toolsData = [] } =
+    await chrome.storage.local.get("tools-metadata");
+  let isToolsPageLoaded = false;
+  if (toolsData.length !== 0) {
+    const windowHost = await getCurrentTabUrl();
 
-  loadHTML("show-page-content", "home");
+    if (windowHost) {
+      console.log(windowHost.host);
+      const tool = toolsData.find(
+        (tool) => new URL(tool.host).host === windowHost.host,
+      )?.path;
+
+      console.log(tool);
+
+      if (tool) {
+        loadHTML("show-page-content", "tools", tool, toolsData);
+        isToolsPageLoaded = true;
+      }
+    }
+  }
+
   await setupNavigation();
-  updateHoliday();
-  showIndicator();
+  if (!isToolsPageLoaded) {
+    
+    loadHTML("show-page-content", "home");
+    updateHoliday();
+    showIndicator();
+  }
 });
 
 document.getElementById("showPopup").addEventListener("click", () => {
@@ -73,7 +95,7 @@ document
  * @param {string} id - The ID of the container element to load content into.
  * @param {string} file - The name of the HTML file (without extension) to load.
  */
-function loadHTML(id, file) {
+function loadHTML(id, file, tool = null, toolsData = null) {
   const container = document.getElementById(id);
   container.classList.remove("active");
 
@@ -83,7 +105,7 @@ function loadHTML(id, file) {
       .then((response) => response.text())
       .then((data) => {
         container.innerHTML = data;
-        
+
         // Initialize scripts based on the loaded page
 
         deactivateToolStorage();
@@ -95,8 +117,8 @@ function loadHTML(id, file) {
           setupSettingsPage();
         } else if (file === "notice") {
           setupNoticePage();
-        } else if(file === "tools"){
-          setupToolsMenu();        
+        } else if (file === "tools") {
+          setupToolsMenu(tool, toolsData);
         }
 
         setTimeout(() => {
@@ -166,13 +188,11 @@ async function setupNavigation() {
   }
 }
 
-
-
 /**
  * Reads notice metadata from local storage, updates the browser action badge,
  * and renders or removes the notice count indicator in the navigation.
  */
-async function showIndicator(){
+async function showIndicator() {
   const { data_notice } = await chrome.storage.local.get("data_notice");
   const count = data_notice?.new_count ?? 0;
   updateBadge(count);
@@ -199,37 +219,33 @@ async function showIndicator(){
  * @param {number} count - The number of unread notices to display.
  */
 function updateBadge(count) {
-    chrome.action.setBadgeText({
-        text: count > 0 ? String(count) : ""
-    });
+  chrome.action.setBadgeText({
+    text: count > 0 ? String(count) : "",
+  });
 
-    chrome.action.setBadgeBackgroundColor({
-        color: "#d93025"
-    });
+  chrome.action.setBadgeBackgroundColor({
+    color: "#d93025",
+  });
 }
 
-
-async function updateHoliday(){
-    const { holiday_data } = await chrome.storage.local.get("holiday_data");
-    if (holiday_data) {
-        const nextParseDate = new Date(holiday_data.next_parse);
-        if (!isNaN(nextParseDate.getTime())) {
-            nextParseDate.setMinutes(nextParseDate.getMinutes() + 10);
-            if (new Date() <= nextParseDate) {
-                return;
-            }
-        }
+async function updateHoliday() {
+  const { holiday_data } = await chrome.storage.local.get("holiday_data");
+  if (holiday_data) {
+    const nextParseDate = new Date(holiday_data.next_parse);
+    if (!isNaN(nextParseDate.getTime())) {
+      nextParseDate.setMinutes(nextParseDate.getMinutes() + 10);
+      if (new Date() <= nextParseDate) {
+        return;
+      }
     }
+  }
 
-    const data = await fetchParsedData("holidays");
+  const data = await fetchParsedData("holidays");
 
-    if (data) {
-        
-        await chrome.storage.local.set({ holiday_data: data });
-    }
+  if (data) {
+    await chrome.storage.local.set({ holiday_data: data });
+  }
 }
-
-
 
 //TPE Skip Code
 

@@ -3,55 +3,14 @@
  * Handles menu transitions, loads content dynamically based on user selection,
  * and manages the back button to return to the menu.
  */
-async function setupToolsMenu() {
-
-
-
-
+async function setupToolsMenu(toolName = null, allToolsData = null) {
   const menu = document.getElementById("toolsMenu");
   const toolsItems = document.getElementById("toolsItem");
   const contentBox = document.getElementById("tools-container");
   const toolsContent = document.getElementById("tools-contents");
   const backBtn = document.getElementById("backToMenu");
 
-
-
-  // Load metadata for all tools from tools-metadata
-  let { ["tools-metadata"]: toolsData = [] } =
-    await chrome.storage.local.get("tools-metadata");
-
-  console.log(toolsData);
-  if (toolsData.length === 0) {
-    await Promise.all(
-       defaultTools().map((tool) => storeMetadataInStorage(tool))
-    );
-
-    ({ ["tools-metadata"]: toolsData = [] } =
-      await chrome.storage.local.get("tools-metadata"));
-  }
-
-  // Create menu items
-  toolsData.forEach((tool) => {
-    const li = document.createElement("li");
-
-    li.classList.add("list-group-item", "option-btn");
-
-    li.dataset.topic = tool.path;
-    li.innerText = tool.name;
-
-    toolsItems.appendChild(li);
-  });
-
-  // Handle tool selection
-  toolsItems.addEventListener("click", async (event) => {
-    const option = event.target.closest(".option-btn");
-
-    if (!option) {
-      return;
-    }
-
-    const toolName = option.dataset.topic;
-
+  const openTool = (toolName, toolsData) => {
     // Find metadata
     const toolMeta = toolsData.find((tool) => tool.path === toolName);
 
@@ -127,6 +86,47 @@ async function setupToolsMenu() {
       },
       { once: true },
     );
+  };
+
+  if (toolName !== null && allToolsData !== null) {
+    openTool(toolName, allToolsData);
+    return;
+  }
+
+  // Load metadata for all tools from tools-metadata
+  let { ["tools-metadata"]: toolsData = [] } =
+    await chrome.storage.local.get("tools-metadata");
+
+  console.log(toolsData);
+  if (toolsData.length === 0) {
+    await Promise.all(
+      defaultTools().map((tool) => storeMetadataInStorage(tool)),
+    );
+
+    ({ ["tools-metadata"]: toolsData = [] } =
+      await chrome.storage.local.get("tools-metadata"));
+  }
+
+  // Create menu items
+  toolsData.forEach((tool) => {
+    const li = document.createElement("li");
+
+    li.classList.add("list-group-item", "option-btn");
+
+    li.dataset.topic = tool.path;
+    li.innerText = tool.name;
+
+    toolsItems.appendChild(li);
+  });
+
+  // Handle tool selection
+  toolsItems.addEventListener("click", async (event) => {
+    const option = event.target.closest(".option-btn");
+    if (!option) {
+      return;
+    }
+    const toolName = option.dataset.topic;
+    await openTool(toolName, toolsData);
   });
 
   // Back button

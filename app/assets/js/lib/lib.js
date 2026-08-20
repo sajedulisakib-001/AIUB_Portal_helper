@@ -9,6 +9,31 @@ async function delay(ms) {
 
 
 /**
+ * Gets the URL of the currently active Chrome tab.
+ *
+ * Returns the URL as a JavaScript URL object, allowing properties
+ * such as `href`, `origin`, `hostname`, `pathname`, `search`, and `hash`.
+ *
+ * @returns {Promise<URL|null>} The current tab URL as a URL object.
+ */
+async function getCurrentTabUrl() {
+    const [tab] = await chrome.tabs.query({
+        active: true,
+        currentWindow: true
+    });
+
+    if (!tab?.url) {
+        return null;
+    }
+
+    try {
+        return new URL(tab.url);
+    } catch (error) {
+        return null;
+    }
+}
+
+/**
  * Returns Default tools list.
  * @returns {Array<String>} - Array of the default tools.
  */
