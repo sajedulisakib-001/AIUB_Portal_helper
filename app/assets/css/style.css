@@ -23,7 +23,6 @@ body {
 
 .header {
     text-align: center;
-    margin-bottom: 10px;
 }
 
 .header h2 {
@@ -33,7 +32,7 @@ body {
 
 .page {
     flex: 1;
-    overflow-y: auto;
+    overflow: none;
     display: none;
     opacity: 0;
     transform: translateY(10px);
@@ -184,8 +183,8 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 100%;
-    padding: 10px;
+    height: 88%;
+    padding: 2px;
     box-sizing: border-box;
 }
 
@@ -262,6 +261,7 @@ body {
 /* Scrollbar styling */
 .fancy-scrollbar {
     overflow-y: scroll;
+    height: 100%;
 }
 
 /* WebKit scrollbar styling */

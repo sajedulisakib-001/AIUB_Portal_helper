@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", async () => {
   const isEmpty =
     Object.keys(await chrome.storage.local.get(null)).length === 0;

@@ -4,8 +4,7 @@
  * If the user has never configured tools before,
  * these tools will be used.
  */
-const DEFAULT_TOOLS = ["geogebra"];
-
+const DEFAULT_TOOLS = defaultTools();
 /**
  * Initializes and sets up the settings page functionality.
  *
@@ -192,26 +191,38 @@ function showToolError(message) {
 
 /**
  * Loads the current tools from Chrome Storage.
+ * Adds any missing default tools and then renders all tools.
  */
 async function loadCurrentTools() {
-  const result = await chrome.storage.local.get(["tools"]);
+  let tools = await getAllToolPaths();
 
-  let tools = result.tools;
+  // Find default tools that are not currently stored.
+  const missingTools = DEFAULT_TOOLS.filter((tool) => !tools.includes(tool));
 
-  /*
-   * If tools do not exist yet,
-   * use the default tools.
-   */
-  if (!Array.isArray(tools)) {
-    tools = [...DEFAULT_TOOLS];
+  // Add missing default tools.
+  if (missingTools.length > 0) {
+    await Promise.all(missingTools.map((tool) => storeMetadataInStorage(tool)));
 
-    await chrome.storage.local.set({
-      tools: tools,
-    });
+    // Get the updated tool list.
+    tools = await getAllToolPaths();
   }
 
   renderTools(tools);
 }
+
+async function getAllToolPaths() {
+  const { ["tools-metadata"]: tools = [] } =
+    await chrome.storage.local.get("tools-metadata");
+
+  if (!Array.isArray(tools)) {
+    return [];
+  }
+
+  return tools
+    .map((tool) => tool.path)
+    .filter((path) => typeof path === "string");
+}
+
 /**
  * Displays current tools in the Settings page.
  */
@@ -349,20 +360,12 @@ async function saveSettingsInStorage() {
     return false;
   }
 
-  const toolResult = await chrome.storage.local.get(["tools"]);
-
-  const tools = Array.isArray(toolResult.tools)
-    ? toolResult.tools
-    : [...DEFAULT_TOOLS];
-
   const data = {
     autoLogin,
 
     apiKey,
 
     showTomorrowsRoutineAt,
-
-    tools,
   };
 
   if (username !== "") {
@@ -376,17 +379,6 @@ async function saveSettingsInStorage() {
   await chrome.storage.local.set({
     settings: data,
   });
-
-  /*
-   * Also keep tools as their own storage key.
-   *
-   * This makes it easy for the Tools menu to access
-   * them without loading the entire settings object.
-   */
-  await chrome.storage.local.set({
-    tools: tools,
-  });
-
   return true;
 }
 
@@ -477,57 +469,194 @@ function showSelectedTimeforT(time) {
  * Therefore, deleting "geogebra" is allowed.
  */
 async function deleteTool(toolName) {
-  try {
-    /*
-     * Get the current tools.
-     */
-    const result = await chrome.storage.local.get(["tools"]);
-
-    /*
-     * If the key somehow doesn't exist,
-     * there is nothing to delete.
-     */
-    if (!Array.isArray(result.tools)) {
-      return;
-    }
-
-    /*
-     * Remove only the selected tool.
-     */
-    const tools = result.tools.filter((tool) => tool !== toolName);
-
-    /*
-     * Save the updated list.
-     *
-     * If this becomes [],
-     * we intentionally keep [].
-     *
-     * We DO NOT restore geogebra here.
-     */
-    await chrome.storage.local.set({
-      tools: tools,
-    });
-
-    /*
-     * Keep settings.tools synchronized.
-     */
-    const settingsResult = await chrome.storage.local.get(["settings"]);
-
-    if (settingsResult.settings) {
-      const settings = settingsResult.settings;
-
-      settings.tools = tools;
-
-      await chrome.storage.local.set({
-        settings: settings,
-      });
-    }
-
-    /*
-     * Update the UI immediately.
-     */
+  if (await deleteToolMetadata(toolName)) {
     renderTools(tools);
-  } catch (error) {
-    console.error("Failed to delete tool:", error);
   }
+}
+
+async function deleteToolMetadata(tool) {
+  if (DEFAULT_TOOLS.includes(tool)) return true;
+  const { ["tools-metadata"]: oldData = [] } =
+    await chrome.storage.local.get("tools-metadata");
+
+  if (!Array.isArray(oldData)) {
+    return false;
+  }
+
+  const newData = oldData.filter((item) => item.path !== tool);
+
+  // Tool didn't exist
+  if (newData.length === oldData.length) {
+    return false;
+  }
+
+  await chrome.storage.local.set({
+    "tools-metadata": newData,
+  });
+
+  return true;
+}
+
+// `tool` is the actual folder name and the tool nickname.
+async function storeMetadataInStorage(tool) {
+  const { ["tools-metadata"]: oldData = [] } =
+    await chrome.storage.local.get("tools-metadata");
+
+  const fetchData = async (tool) => {
+    const path = `app/tools/${tool}/metadata.json`;
+
+    try {
+      const response = await fetch(chrome.runtime.getURL(path));
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const json = await response.json();
+
+      return {
+        ...json,
+        path: tool,
+      };
+    } catch (error) {
+      console.error(`Error loading ${path}:`, error);
+      return null;
+    }
+  };
+
+  const newTool = await fetchData(tool);
+
+  if (!newTool) {
+    return false;
+  }
+
+  // Validate metadata and tool files.
+  const isValidTool = await validateAllFiles(newTool, tool);
+
+  if (!isValidTool) {
+    return false;
+  }
+
+  // Prevent the same tool folder from being added twice.
+  if (Array.isArray(oldData) && oldData.some((item) => item.path === tool)) {
+    return false;
+  }
+
+  await chrome.storage.local.set({
+    "tools-metadata": [...(Array.isArray(oldData) ? oldData : []), newTool],
+  });
+
+  return true;
+}
+
+async function validateAllFiles(metadata, path) {
+  if (!metadata || typeof metadata !== "object") {
+    return false;
+  }
+
+  if (!path || typeof path !== "string") {
+    return false;
+  }
+
+  const base = `app/tools/${path}`;
+  const actions = metadata.actions || {};
+
+  // Test whether a file exists and optionally return its content.
+  const test = async (filePath) => {
+    try {
+      const response = await fetch(chrome.runtime.getURL(filePath));
+
+      if (!response.ok) {
+        return [false, null];
+      }
+
+      return [true, await response.text()];
+    } catch (error) {
+      return [false, null];
+    }
+  };
+
+  // Detect real <script> tags while ignoring HTML comments.
+  const hasScript = (html) => {
+    if (typeof html !== "string") {
+      return false;
+    }
+
+    const withoutComments = html.replace(/<!--[\s\S]*?-->/g, "");
+
+    return /<script\b[^>]*>/i.test(withoutComments);
+  };
+
+  /*
+   * Validate entry HTML
+   */
+  if (metadata.entry) {
+    if (typeof metadata.entry !== "string") {
+      return false;
+    }
+
+    const htmlPath = `${base}/${metadata.entry}.html`;
+    const data = await test(htmlPath);
+
+    if (!data[0]) {
+      return false;
+    }
+
+    // Tool HTML must not contain executable script tags.
+    if (hasScript(data[1])) {
+      return false;
+    }
+  }
+
+  /*
+   * Validate JavaScript action
+   */
+  if (actions.run) {
+    if (!actions.script || typeof actions.script !== "string") {
+      return false;
+    }
+
+    if (!metadata.entry) {
+      return false;
+    }
+
+    const scriptPath = `${base}/${actions.script}.js`;
+
+    try {
+      const scriptExists = await test(scriptPath);
+
+      if (!scriptExists[0]) {
+        return false;
+      }
+
+      const module = await import(chrome.runtime.getURL(scriptPath));
+
+      // Make sure tool() exists.
+      if (typeof module.tool !== "function") {
+        return false;
+      }
+    } catch (error) {
+      console.error(`Failed to load tool script: ${scriptPath}`, error);
+
+      return false;
+    }
+  }
+
+  /*
+   * Validate CSS action
+   */
+  if (actions.css) {
+    if (typeof actions.css !== "string") {
+      return false;
+    }
+
+    const cssPath = `${base}/${actions.css}.css`;
+    const cssExists = await test(cssPath);
+
+    if (!cssExists[0]) {
+      return false;
+    }
+  }
+
+  return true;
 }

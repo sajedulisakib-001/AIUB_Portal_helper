@@ -14,7 +14,7 @@ export function tool(path) {
   const swatch = document.getElementById("t-swatch");
 
   howToUseBtn.addEventListener("click", () => {
-    chrome.tabs.create({ url: chrome.runtime.getURL(`${path}help.html`) });
+    chrome.tabs.create({ url: chrome.runtime.getURL(`${path}other/help.html`) });
   });
 
   // In-popup tab navigation -- switches which page is visible without

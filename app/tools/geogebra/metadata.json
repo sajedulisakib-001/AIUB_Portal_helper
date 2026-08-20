@@ -11,7 +11,7 @@
         "url": "https://github.com/sajedulisakib-001/"
     },
     "actions":{
-        "scripts":"script",
+        "script":"script",
         "css": "style",
         "run":true
     }

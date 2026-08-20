@@ -4,52 +4,31 @@
  * and manages the back button to return to the menu.
  */
 async function setupToolsMenu() {
+
+
+
+
   const menu = document.getElementById("toolsMenu");
   const toolsItems = document.getElementById("toolsItem");
   const contentBox = document.getElementById("tools-container");
   const toolsContent = document.getElementById("tools-contents");
   const backBtn = document.getElementById("backToMenu");
 
-  // Get tools from storage
-  const { tools = [] } = await chrome.storage.local.get("tools");
 
-  // No tools
-  if (!Array.isArray(tools) || tools.length === 0) {
-    menu.innerHTML = `
-            <div style="padding: 40px; text-align: center;">
-                <h3>No Tools Found!</h3>
-            </div>
-        `;
-    return;
-  }
 
-  // Load metadata for all tools
-  const toolsData = (
+  // Load metadata for all tools from tools-metadata
+  let { ["tools-metadata"]: toolsData = [] } =
+    await chrome.storage.local.get("tools-metadata");
+
+  console.log(toolsData);
+  if (toolsData.length === 0) {
     await Promise.all(
-      tools.map(async (tool) => {
-        const path = `app/tools/${tool}/metadata.json`;
+       defaultTools().map((tool) => storeMetadataInStorage(tool))
+    );
 
-        try {
-          const response = await fetch(chrome.runtime.getURL(path));
-
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-
-          const json = await response.json();
-
-          return {
-            ...json,
-            path: tool,
-          };
-        } catch (error) {
-          console.error(`Error loading ${path}:`, error);
-
-          return null;
-        }
-      }),
-    )
-  ).filter(Boolean);
+    ({ ["tools-metadata"]: toolsData = [] } =
+      await chrome.storage.local.get("tools-metadata"));
+  }
 
   // Create menu items
   toolsData.forEach((tool) => {
@@ -125,17 +104,24 @@ async function setupToolsMenu() {
           await delay(50);
           try {
             const module = await import(
-              chrome.runtime.getURL(`../../app/tools/${toolName}/script.js`)
+              chrome.runtime.getURL(
+                `../../app/tools/${toolName}/${toolMeta.actions.script}.js`,
+              )
             );
 
             // Make sure tool() exists
             if (typeof module.tool === "function") {
               await module.tool(`app/tools/${toolName}/`);
             } else {
-              console.error(`${toolName}/script.js does not export tool()`);
+              console.error(
+                `${toolName}/${toolMeta.actions.script}.js does not export tool()`,
+              );
             }
           } catch (error) {
-            console.error(`Error loading ${toolName}/script.js:`, error);
+            console.error(
+              `Error loading ${toolName}/${toolMeta.actions.script}.js:`,
+              error,
+            );
           }
         }
       },

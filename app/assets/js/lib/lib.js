@@ -4,10 +4,17 @@
  * @returns {Promise<void>} - A promise that resolves after the delay.
  */
 async function delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 
+/**
+ * Returns Default tools list.
+ * @returns {Array<String>} - Array of the default tools.
+ */
+function defaultTools() {
+  return ["geogebra"];
+}
 
 /**
  * Retrieves the current date and time details, including today's and the next day's formatted dates.
@@ -21,16 +28,16 @@ async function delay(ms) {
  *   - {number} month - The current month (0-11).
  */
 function getDateTime() {
-    const T = new Date();
-    const date = T.getDate();
-    const hours = T.getHours();
-    const minutes = T.getMinutes();
-    const today = formatDate(T);
-    const nextDay = new Date(T);
-    nextDay.setDate(T.getDate() + 1);
-    const formatedNextDay = formatDate(nextDay);
-    const month = T.getMonth();
-    return { date, hours, minutes, today, nextDay: formatedNextDay, month };
+  const T = new Date();
+  const date = T.getDate();
+  const hours = T.getHours();
+  const minutes = T.getMinutes();
+  const today = formatDate(T);
+  const nextDay = new Date(T);
+  nextDay.setDate(T.getDate() + 1);
+  const formatedNextDay = formatDate(nextDay);
+  const month = T.getMonth();
+  return { date, hours, minutes, today, nextDay: formatedNextDay, month };
 }
 
 /**
@@ -41,18 +48,18 @@ function getDateTime() {
  * @returns {string} The formatted date string in English (US) locale.
  */
 function formatDate(date) {
-    try {
-        const options = {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric"
-        };
-        return new Intl.DateTimeFormat("en-US", options).format(date);
-    } catch (e) {
-        console.error("Error formatting date:", e);
-        return date.toDateString(); // Fallback to a simpler format
-    }
+  try {
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return new Intl.DateTimeFormat("en-US", options).format(date);
+  } catch (e) {
+    console.error("Error formatting date:", e);
+    return date.toDateString(); // Fallback to a simpler format
+  }
 }
 
 /**
@@ -68,34 +75,36 @@ function formatDate(date) {
  * @throws Will log an error and return false if the fetch or comparison fails.
  */
 async function isUpdateAvailable() {
-    const currentVersion = chrome.runtime.getManifest().version;
-    const result = {
-        isAvailable: false,
-        updateType: "No Update",
-        currentVersion,
-        latestVersion: currentVersion
-    };
-    try {
-        const res = await fetch('https://raw.githubusercontent.com/sajedulisakib-001/AIUB_Portal_helper/main/manifest.json');
-        const latestVersion = (await res.json()).version;
-        result.latestVersion = latestVersion;
-        const toNumbers = v => v.split('.').map(n => parseInt(n) || 0);
-        const [cMajor, cMinor, cPatch] = toNumbers(currentVersion);
-        const [lMajor, lMinor, lPatch] = toNumbers(latestVersion);
-        if (lMajor > cMajor) {
-            result.updateType = "Major";
-            result.isAvailable = true;
-        } else if (lMinor > cMinor) {
-            result.updateType = "Minor";
-            result.isAvailable = true;
-        } else if (lPatch > cPatch) {
-            result.updateType = "Patch";
-            result.isAvailable = true;
-        }
-    } catch (e) {
-        console.error("Error checking for update:", e);
+  const currentVersion = chrome.runtime.getManifest().version;
+  const result = {
+    isAvailable: false,
+    updateType: "No Update",
+    currentVersion,
+    latestVersion: currentVersion,
+  };
+  try {
+    const res = await fetch(
+      "https://raw.githubusercontent.com/sajedulisakib-001/AIUB_Portal_helper/main/manifest.json",
+    );
+    const latestVersion = (await res.json()).version;
+    result.latestVersion = latestVersion;
+    const toNumbers = (v) => v.split(".").map((n) => parseInt(n) || 0);
+    const [cMajor, cMinor, cPatch] = toNumbers(currentVersion);
+    const [lMajor, lMinor, lPatch] = toNumbers(latestVersion);
+    if (lMajor > cMajor) {
+      result.updateType = "Major";
+      result.isAvailable = true;
+    } else if (lMinor > cMinor) {
+      result.updateType = "Minor";
+      result.isAvailable = true;
+    } else if (lPatch > cPatch) {
+      result.updateType = "Patch";
+      result.isAvailable = true;
     }
-    return result;
+  } catch (e) {
+    console.error("Error checking for update:", e);
+  }
+  return result;
 }
 
 /**
@@ -104,17 +113,25 @@ async function isUpdateAvailable() {
  * @returns {string} The converted Exam date string.
  */
 function convertExamDate(input) {
-    const [day, mon, year] = input.split("/");
+  const [day, mon, year] = input.split("/");
 
-    const months = {
-        Jan: "01", Feb: "02", Mar: "03", Apr: "04",
-        May: "05", Jun: "06", Jul: "07", Aug: "08",
-        Sep: "09", Oct: "10", Nov: "11", Dec: "12"
-    };
+  const months = {
+    Jan: "01",
+    Feb: "02",
+    Mar: "03",
+    Apr: "04",
+    May: "05",
+    Jun: "06",
+    Jul: "07",
+    Aug: "08",
+    Sep: "09",
+    Oct: "10",
+    Nov: "11",
+    Dec: "12",
+  };
 
-    return `${year}-${months[mon]}-${day}`;
+  return `${year}-${months[mon]}-${day}`;
 }
-
 
 /**
  * Fetch parsed data from the remote API based on the provided action.
@@ -127,24 +144,23 @@ function convertExamDate(input) {
  * const notices = await fetchParsedData("notices");
  */
 async function fetchParsedData(action) {
-    const API_URL = `https://24562381.wasmer.app/?action=${action}`;
+  const API_URL = `https://24562381.wasmer.app/?action=${action}`;
 
-    try {
-        const response = await fetch(API_URL, {
-            method: "GET",
-            headers: {
-                Accept: "application/json",
-            },
-        });
+  try {
+    const response = await fetch(API_URL, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+      },
+    });
 
-        if (!response.ok) {
-            throw new Error(`HTTP Error: ${response.status}`);
-        }
-
-        return await response.json();
-
-    } catch (error) {
-        console.error("Failed to fetch parsed data:", error);
-        return null;
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
     }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Failed to fetch parsed data:", error);
+    return null;
+  }
 }
