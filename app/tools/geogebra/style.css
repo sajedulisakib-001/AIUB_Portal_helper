@@ -1,31 +1,61 @@
+/* GeoGebra Point Extractor -- styled to match the extension's own UI
+ * (Segoe UI, #0d6efd blue, white rounded cards, soft shadows -- see
+ * app/assets/css/style.css: .routine-item, #unlocked, #courseListContainer).
+ *
+ * Sized to fit entirely inside #tools-container with no scrolling: every
+ * element below has an explicit, budgeted height instead of relying on
+ * the popup's available space, so nothing overflows the 500x600 popup.
+ */
+
 * {
   box-sizing: border-box;
 }
 
 .t-container {
-  padding: 16px;
+  padding: 12px 14px;
+  font-family: inherit;
 }
 
+/* Header */
 .t-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
-  gap: 10px;
+  margin-bottom: 8px;
 }
 
-.t-headerBtns {
-  display: flex;
-  gap: 6px;
+.t-container h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0d6efd;
+  letter-spacing: -0.2px;
+}
+
+.t-help-btn {
   flex-shrink: 0;
+  width: auto;
+  margin-top: 0;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  background: #eaf2ff;
+  color: #0d6efd;
+  border: 1px solid #cfe0ff;
 }
 
+.t-help-btn:hover {
+  background: #dcebff;
+}
+
+/* Segmented tab control */
 .t-tabs {
   display: flex;
-  background: #e5e9f0;
+  background: #eef1f6;
   border-radius: 8px;
   padding: 3px;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   gap: 3px;
 }
 
@@ -33,55 +63,52 @@
   flex: 1;
   width: auto;
   margin-top: 0;
-  padding: 8px 10px;
+  padding: 7px 6px;
   border-radius: 6px;
   background: transparent;
-  color: #4b5563;
-  font-size: 12.5px;
+  color: #495057;
+  font-size: 11.5px;
   font-weight: 600;
 }
 
 .t-tab:hover {
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .t-tab.active {
-  background: white;
-  color: #2563eb;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+  background: #ffffff;
+  color: #0d6efd;
+  box-shadow: 0 1px 3px rgba(13, 110, 253, 0.18);
+}
+
+/* Pages */
+.t-page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .t-page.hidden {
   display: none;
 }
 
-.t-container h2 {
-  margin: 0;
-  font-size: 18px;
-  letter-spacing: -0.2px;
-}
-
+/* Cards -- match the app's routine-item / course-list card language */
 .t-card {
   background: #ffffff;
-  border: 1px solid #e2e5eb;
+  border: 1px solid #e3e8f0;
   border-radius: 10px;
-  padding: 14px 16px;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  padding: 10px 12px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
 }
 
 .t-card label {
   display: block;
-  margin: 0 0 6px;
-  font-size: 12.5px;
+  margin: 0 0 5px;
+  font-size: 10.5px;
   font-weight: 700;
-  color: #374151;
+  color: #495057;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-}
-
-.t-card label:not(:first-child) {
-  margin-top: 12px;
 }
 
 .t-container select,
@@ -90,64 +117,69 @@
   width: 100%;
   box-sizing: border-box;
   border: 1px solid #d0d5dd;
-  border-radius: 8px;
-  padding: 9px 10px;
-  font-size: 13px;
+  border-radius: 7px;
+  padding: 7px 9px;
+  font-size: 12.5px;
   font-family: inherit;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .t-container select:focus,
 .t-container input:focus,
 .t-container textarea:focus {
   outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
 }
 
-.t-container input[readonly] {
+.t-container input[readonly],
+.t-container textarea[readonly] {
   background: #f9fafb;
   color: #374151;
 }
 
-.t-container textarea {
-  height: 280px;
-  resize: vertical;
+/* Output card: fixed-height textarea sized to fit the popup with no
+ * page-level scrolling. Long output scrolls inside the textarea itself
+ * (normal textarea behavior), not the tools page. */
+.t-outputCard textarea {
+  height: 180px;
+  resize: none;
   font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 12.5px;
+  font-size: 12px;
   line-height: 1.5;
+}
+
+.t-btnRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.t-btnRow button {
+  width: auto;
+  flex: 1;
 }
 
 .t-container button {
   width: 100%;
-  margin-top: 12px;
-  padding: 10px;
+  margin-top: 0;
+  padding: 8px;
   border: 0;
-  border-radius: 8px;
-  background: #2563eb;
+  border-radius: 7px;
+  background: #0d6efd;
   color: white;
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease, transform 0.05s ease;
 }
 
 .t-container button:hover {
-  background: #1d4ed8;
+  background: #0b5ed7;
 }
 
 .t-container button:active {
   transform: translateY(1px);
-}
-
-.t-btnRow {
-  display: flex;
-  gap: 8px;
-}
-
-.t-btnRow button {
-  width: auto;
-  flex: 1;
 }
 
 .t-container button.t-secondary {
@@ -159,62 +191,33 @@
   background: #e2e6ed;
 }
 
-.t-container button.t-small {
-  width: auto;
-  margin-top: 0;
-  padding: 7px 12px;
-  font-size: 12px;
-}
-
-.t-hidden {
-  display: none;
-}
-
-.t-hint {
-  font-size: 11px;
-  color: #6b7280;
-  margin-top: 6px;
-}
-
+/* Color picker placeholder */
 .t-card.t-center {
   text-align: center;
-}
-
-.t-blurb {
-  font-size: 13px;
-  color: #4b5563;
-  line-height: 1.5;
-  margin: 0 0 14px;
-}
-
-.t-swatchRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 14px;
+  padding: 16px 12px;
 }
 
 .t-swatch {
-  width: 38px;
-  height: 38px;
-  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  margin: 0 auto 8px;
   border-radius: 8px;
   border: 1px solid #d0d5dd;
-  background: #f9fafb;
+  background: #f8f9fa;
 }
 
-.t-swatchRow input {
-  text-align: center;
-  font-family: "SFMono-Regular", Consolas, monospace;
+.t-hint {
+  margin: 0;
+  font-size: 11.5px;
+  color: #6c757d;
+  line-height: 1.4;
 }
 
-.t-card.t-center .t-hint {
-  margin-top: 14px;
-}
-
-#t-status {
-  margin-top: 10px;
-  font-size: 12px;
-  color: #374151;
+/* Status line */
+.t-status {
+  margin-top: 6px;
   min-height: 14px;
+  font-size: 11px;
+  color: #6c757d;
+  text-align: center;
 }

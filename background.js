@@ -148,6 +148,11 @@ function updateBadge(count) {
 }
 
 
+
+
+
+
+
 async function colorPicker() {
     try {
         const [tab] = await chrome.tabs.query({

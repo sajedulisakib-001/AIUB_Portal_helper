@@ -82,8 +82,10 @@ function loadHTML(id, file) {
       .then((response) => response.text())
       .then((data) => {
         container.innerHTML = data;
-
+        
         // Initialize scripts based on the loaded page
+
+        deactivateToolStorage();
         if (file === "other") {
           setupOtherMenu();
         } else if (file === "home") {
