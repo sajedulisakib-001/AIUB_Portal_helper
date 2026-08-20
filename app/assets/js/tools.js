@@ -10,7 +10,7 @@ async function setupToolsMenu(toolName = null, allToolsData = null) {
   const toolsContent = document.getElementById("tools-contents");
   const backBtn = document.getElementById("backToMenu");
 
-  const openTool = (toolName, toolsData) => {
+  const openTool = async (toolName, toolsData) => {
     // Find metadata
     const toolMeta = toolsData.find((tool) => tool.path === toolName);
 
@@ -89,7 +89,7 @@ async function setupToolsMenu(toolName = null, allToolsData = null) {
   };
 
   if (toolName !== null && allToolsData !== null) {
-    openTool(toolName, allToolsData);
+    await openTool(toolName, allToolsData);
     return;
   }
 
