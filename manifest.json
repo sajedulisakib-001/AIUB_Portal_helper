@@ -21,7 +21,8 @@
     "permissions": [
         "scripting",
         "tabs",
-        "storage"
+        "storage",
+        "activeTab"
     ],
     "host_permissions": [
         "*://portal.aiub.edu/*"
@@ -37,5 +38,14 @@
                 "*://portal.aiub.edu/*"
             ]
         }
-    ]
+    ],
+    "commands": {
+    "pick_color": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
+      },
+      "description": "Pick a color from anywhere on screen"
+    }
+  }
 }

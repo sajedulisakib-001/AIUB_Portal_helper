@@ -83,6 +83,13 @@ async function setupToolsMenu() {
 
     console.log("Item Clicked:", toolName);
 
+    // Sandbox chrome.storage.local to this tool's own namespace before
+    // any of its code runs, so it can't read or overwrite the extension's
+    // own data (settings, credentials, notices, etc.) or another tool's
+    // data. Deactivated again in the back-button handler below.
+    deactivateToolStorage();
+    activateToolStorage(toolName);
+
     // Hide menu
     menu.classList.add("fade-out");
 
@@ -118,7 +125,7 @@ async function setupToolsMenu() {
           await delay(50);
           try {
             const module = await import(
-              chrome.runtime.getURL(`app/tools/${toolName}/script.js`)
+              chrome.runtime.getURL(`../../app/tools/${toolName}/script.js`)
             );
 
             // Make sure tool() exists
@@ -138,6 +145,10 @@ async function setupToolsMenu() {
 
   // Back button
   backBtn.addEventListener("click", () => {
+    // Leaving the tool -- restore unrestricted storage access for the
+    // rest of the extension.
+    deactivateToolStorage();
+
     contentBox.classList.add("fade-out");
 
     contentBox.addEventListener(

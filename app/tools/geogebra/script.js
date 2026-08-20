@@ -1,17 +1,17 @@
 export function tool(path) {
-  const skippedPoints = document.getElementById("skippedPoints");
-  const output = document.getElementById("output");
-  const getData = document.getElementById("getData");
-  const status = document.getElementById("status");
-  const copyBtn = document.getElementById("copyBtn");
-  const howToUseBtn = document.getElementById("howToUseBtn");
+  const skippedPoints = document.getElementById("t-skippedPoints");
+  const output = document.getElementById("t-output");
+  const getData = document.getElementById("t-getData");
+  const status = document.getElementById("t-status");
+  const copyBtn = document.getElementById("t-copyBtn");
+  const howToUseBtn = document.getElementById("t-howToUseBtn");
 
-  const tabExtractBtn = document.getElementById("tabExtractBtn");
-  const tabColorBtn = document.getElementById("tabColorBtn");
-  const pageExtract = document.getElementById("pageExtract");
-  const pageColor = document.getElementById("pageColor");
+  const tabExtractBtn = document.getElementById("t-tabExtractBtn");
+  const tabColorBtn = document.getElementById("t-tabColorBtn");
+  const pageExtract = document.getElementById("t-pageExtract");
+  const pageColor = document.getElementById("t-pageColor");
 
-  const swatch = document.getElementById("swatch");
+  const swatch = document.getElementById("t-swatch");
 
   howToUseBtn.addEventListener("click", () => {
     chrome.tabs.create({ url: chrome.runtime.getURL(`${path}help.html`) });
