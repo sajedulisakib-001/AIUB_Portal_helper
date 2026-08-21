@@ -5,6 +5,7 @@
  * these tools will be used.
  */
 const DEFAULT_TOOLS = defaultTools();
+
 /**
  * Initializes and sets up the settings page functionality.
  *
@@ -37,18 +38,18 @@ async function setupSettingsPage() {
   });
 
   /*
-   * Add new tool
+   * Add new tool.
+   *
+   * Both the button click and the Enter key go through the same
+   * handler so the tool list is always refreshed after a
+   * successful add, and the input is cleared either way.
    */
-  addToolBtn.addEventListener("click", addNewTool);
+  addToolBtn.addEventListener("click", handleAddToolRequest);
 
-  /*
-   * Allow Enter key to add a tool.
-   */
-  toolFolderInput.addEventListener("keydown", function (event) {
+  toolFolderInput.addEventListener("keydown", async function (event) {
     if (event.key === "Enter") {
       event.preventDefault();
-
-      addNewTool();
+      await handleAddToolRequest();
     }
   });
 
@@ -85,6 +86,24 @@ async function setupSettingsPage() {
    * Load current tools.
    */
   await loadCurrentTools();
+}
+
+/**
+ * Shared handler for both the "Add" button and pressing Enter
+ * in the tool-folder input. Adds the tool and, on success,
+ * refreshes the rendered tool list and clears the input.
+ */
+async function handleAddToolRequest() {
+  const result = await addNewTool();
+
+  if (result.success) {
+    await loadCurrentTools();
+
+    const input = document.getElementById("tool-folder");
+    input.value = "";
+  }
+
+  return result;
 }
 
 /**
@@ -151,51 +170,6 @@ async function addNewTool() {
 
     return result;
   }
-
-  /*
-   * Read current tools.
-   */
-  const result = await chrome.storage.local.get(["tools"]);
-
-  const tools = Array.isArray(result.tools) ? result.tools : [...DEFAULT_TOOLS];
-
-  /*
-   * Prevent duplicate tools.
-   */
-  if (tools.includes(folderName)) {
-    const validationResult = {
-      success: false,
-      error: "DUPLICATE_TOOL",
-      message: `"${folderName}" is already in your tools.`,
-      tool: folderName,
-    };
-
-    showToolError(validationResult);
-
-    return validationResult;
-  }
-
-  /*
-   * Add new tool.
-   */
-  tools.push(folderName);
-
-  /*
-   * Save tools immediately.
-   */
-  await chrome.storage.local.set({
-    tools: tools,
-  });
-
-  /*
-   * Clear input.
-   */
-  input.value = "";
-
-  /*
-   * Refresh tool list.
-   */
-  renderTools(tools);
 
   /*
    * Store and validate the tool metadata.
@@ -267,36 +241,31 @@ function showToolError(result) {
 /**
  * Loads the current tools from Chrome Storage.
  * Adds any missing default tools and then renders all tools.
+ *
+ * NOTE: missing default tools are added one at a time (sequentially),
+ * not with Promise.all. storeMetadataInStorage() does a
+ * read-modify-write on chrome.storage.local, so running several
+ * of those concurrently causes a race condition where each write
+ * clobbers the previous one and tools silently disappear.
  */
 async function loadCurrentTools() {
   let tools = await getAllToolPaths();
 
-  // Find default tools that are not currently stored.
   const missingTools = DEFAULT_TOOLS.filter((tool) => !tools.includes(tool));
 
-  // Add missing default tools.
-  if (missingTools.length > 0) {
-    const results = await Promise.all(
-      missingTools.map((tool) => storeMetadataInStorage(tool)),
-    );
+  for (const tool of missingTools) {
+    const result = await storeMetadataInStorage(tool);
 
-    /*
-     * Check whether every missing tool was stored.
-     */
-    const failed = results.find((result) => !result.success);
-
-    if (!failed) {
-      // Get the updated tool list.
-      tools = await getAllToolPaths();
-    } else {
-      /*
-       * Show the actual validation error.
-       */
-      showToolError(failed);
-
-      console.error("Failed to add tool:", failed);
+    if (!result.success) {
+      showToolError(result);
+      console.error("Failed to add default tool:", result);
+      // Keep going so one bad default tool doesn't block the others.
     }
   }
+
+  // Always re-read from storage so any tools that *did* save
+  // successfully show up, even if a different one failed above.
+  tools = await getAllToolPaths();
 
   renderTools(tools);
 }
@@ -420,6 +389,27 @@ function renderTools(tools) {
 
     container.appendChild(item);
   });
+}
+
+/**
+ * Removes a tool from chrome.storage.local and refreshes the list.
+ *
+ * NOTE: this was referenced by the delete button but was not defined
+ * anywhere in the original file, so clicking "Delete" would throw a
+ * ReferenceError. If you already have a deleteTool() implementation
+ * elsewhere in the extension, remove this one to avoid duplication.
+ */
+async function deleteTool(tool) {
+  const { ["tools-metadata"]: existingTools = [] } =
+    await chrome.storage.local.get("tools-metadata");
+
+  const remainingTools = (
+    Array.isArray(existingTools) ? existingTools : []
+  ).filter((item) => item.path !== tool);
+
+  await chrome.storage.local.set({ "tools-metadata": remainingTools });
+
+  await loadCurrentTools();
 }
 
 /**
@@ -550,35 +540,55 @@ function showSelectedTimeforT(time) {
   document.getElementById("ampm").value = time.ampm;
 }
 
+/**
+ * Fetches app/tools/{tool}/metadata.json for a tool folder.
+ * Returns the parsed metadata (with `path` attached) or null
+ * if it could not be loaded.
+ */
+async function fetchToolMetadata(tool) {
+  const path = `app/tools/${tool}/metadata.json`;
+
+  try {
+    const response = await fetch(chrome.runtime.getURL(path));
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const json = await response.json();
+
+    return {
+      ...json,
+      path: tool,
+    };
+  } catch (error) {
+    console.error(`Error loading ${path}:`, error);
+
+    return null;
+  }
+}
+
 // `tool` is the actual folder name and the tool nickname.
 async function storeMetadataInStorage(tool) {
-  const { ["tools-metadata"]: oldData = [] } =
+  const { ["tools-metadata"]: existingTools = [] } =
     await chrome.storage.local.get("tools-metadata");
 
-  const fetchData = async (tool) => {
-    const path = `app/tools/${tool}/metadata.json`;
+  const currentTools = Array.isArray(existingTools) ? existingTools : [];
 
-    try {
-      const response = await fetch(chrome.runtime.getURL(path));
+  /*
+   * Check for a duplicate first, before doing any of the more
+   * expensive metadata fetching / file validation work below.
+   */
+  if (currentTools.some((item) => item.path === tool)) {
+    return {
+      success: false,
+      error: "DUPLICATE_METADATA",
+      message: `Tool "${tool}" already exists in tools-metadata.`,
+      tool,
+    };
+  }
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
-      const json = await response.json();
-
-      return {
-        ...json,
-        path: tool,
-      };
-    } catch (error) {
-      console.error(`Error loading ${path}:`, error);
-
-      return null;
-    }
-  };
-
-  const newTool = await fetchData(tool);
+  const newTool = await fetchToolMetadata(tool);
 
   /*
    * Metadata file could not be loaded.
@@ -602,22 +612,15 @@ async function storeMetadataInStorage(tool) {
   }
 
   /*
-   * Prevent the same tool folder from being added twice.
-   */
-  if (Array.isArray(oldData) && oldData.some((item) => item.path === tool)) {
-    return {
-      success: false,
-      error: "DUPLICATE_METADATA",
-      message: `Tool "${tool}" already exists in tools-metadata.`,
-      tool,
-    };
-  }
-
-  /*
    * Save the validated tool metadata.
+   *
+   * NOTE: this is a read-modify-write against chrome.storage.local.
+   * Callers must not invoke storeMetadataInStorage() for multiple
+   * tools concurrently (e.g. via Promise.all) or later writes will
+   * silently clobber earlier ones. Add tools one at a time instead.
    */
   await chrome.storage.local.set({
-    "tools-metadata": [...(Array.isArray(oldData) ? oldData : []), newTool],
+    "tools-metadata": [...currentTools, newTool],
   });
 
   return {
@@ -660,17 +663,17 @@ async function validateAllFiles(metadata, path) {
   /*
    * Test whether a file exists and optionally return its content.
    */
-  const test = async (filePath) => {
+  const fileExists = async (filePath) => {
     try {
       const response = await fetch(chrome.runtime.getURL(filePath));
 
       if (!response.ok) {
-        return [false, null];
+        return { exists: false, content: null };
       }
 
-      return [true, await response.text()];
+      return { exists: true, content: await response.text() };
     } catch (error) {
-      return [false, null];
+      return { exists: false, content: null };
     }
   };
 
@@ -725,9 +728,9 @@ async function validateAllFiles(metadata, path) {
       /*
        * Check whether JavaScript file exists.
        */
-      const scriptExists = await test(scriptPath);
+      const script = await fileExists(scriptPath);
 
-      if (!scriptExists[0]) {
+      if (!script.exists) {
         return {
           success: false,
           error: "SCRIPT_NOT_FOUND",
@@ -798,12 +801,12 @@ async function validateAllFiles(metadata, path) {
 
     const htmlPath = `${base}/${metadata.entry}.html`;
 
-    const data = await test(htmlPath);
+    const entry = await fileExists(htmlPath);
 
     /*
      * Entry HTML does not exist.
      */
-    if (!data[0]) {
+    if (!entry.exists) {
       return {
         success: false,
         error: "ENTRY_HTML_NOT_FOUND",
@@ -815,7 +818,7 @@ async function validateAllFiles(metadata, path) {
     /*
      * Tool HTML must not contain executable script tags.
      */
-    if (hasScript(data[1])) {
+    if (hasScript(entry.content)) {
       return {
         success: false,
         error: "SCRIPT_TAG_IN_HTML",
@@ -846,12 +849,12 @@ async function validateAllFiles(metadata, path) {
 
     const cssPath = `${base}/${actions.css}.css`;
 
-    const cssExists = await test(cssPath);
+    const css = await fileExists(cssPath);
 
     /*
      * CSS file does not exist.
      */
-    if (!cssExists[0]) {
+    if (!css.exists) {
       return {
         success: false,
         error: "CSS_NOT_FOUND",
