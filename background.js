@@ -142,29 +142,30 @@ function updateBadge(count) {
 }
 
 
-
-
-
-
-
-async function colorPicker() {
+async function colorPicker(tab) {
     try {
-        const [tab] = await chrome.tabs.query({
-            active: true,
-            currentWindow: true
-        });
+        if (!tab?.id) {
+            const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            tab = activeTab;
+        }
 
         if (!tab?.id) {
             console.error("No active tab found.");
             return;
         }
 
+        // Can't inject into chrome://, the Web Store, the PDF viewer, etc.
+        // Fall back to the popup instead of failing silently.
+        if (!/^https?:\/\//i.test(tab.url || "")) {
+            chrome.action.openPopup().catch((e) =>
+                console.error("Color picker: restricted page and popup fallback failed:", e)
+            );
+            return;
+        }
+
         await chrome.scripting.executeScript({
             target: { tabId: tab.id },
             func: async () => {
-                // Shared notification helper so success/error/unsupported
-                // states all give the user visible feedback instead of
-                // silently doing nothing.
                 function showNotification(text, isError) {
                     const notification = document.createElement("div");
                     notification.textContent = text;
@@ -188,10 +189,7 @@ async function colorPicker() {
                 }
 
                 if (!window.EyeDropper) {
-                    showNotification(
-                        "Color picker isn't supported in this browser.",
-                        true
-                    );
+                    showNotification("Color picker isn't supported in this browser.", true);
                     return;
                 }
 
@@ -204,22 +202,10 @@ async function colorPicker() {
                         await navigator.clipboard.writeText(color);
                         showNotification(`Color Value: ${color} copied!`, false);
                     } catch (clipboardError) {
-                        showNotification(
-                            `Picked ${color}, but couldn't copy it automatically.`,
-                            true
-                        );
+                        showNotification(`Picked ${color}, but couldn't copy it automatically.`, true);
                     }
                 } catch (error) {
-                    // AbortError = user pressed Escape / clicked away to
-                    // cancel -- that's expected, stay silent.
-                    if (error && error.name === "AbortError") {
-                        return;
-                    }
-
-                    // Anything else (e.g. the shortcut didn't carry a
-                    // strong enough user gesture) is a real failure --
-                    // surface it instead of swallowing it, and point the
-                    // user at the reliable fallback.
+                    if (error && error.name === "AbortError") return;
                     showNotification(
                         "Color picker shortcut failed to start. Open the extension popup and use \"Pick Color from Screen\" instead.",
                         true
@@ -232,8 +218,8 @@ async function colorPicker() {
     }
 }
 
-chrome.commands.onCommand.addListener((command) => {
+chrome.commands.onCommand.addListener((command, tab) => {
     if (command === "pick_color") {
-        colorPicker();
+        colorPicker(tab);
     }
 });

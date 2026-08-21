@@ -21,7 +21,8 @@
         "scripting",
         "tabs",
         "storage",
-        "activeTab"
+        "activeTab",
+        "clipboardWrite"
     ],
     "host_permissions": [
         "*://portal.aiub.edu/*"

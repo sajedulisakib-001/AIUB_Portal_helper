@@ -1,12 +1,18 @@
 <div class="t-container">
   <div class="t-header">
     <h2>GeoGebra Extractor</h2>
-    <button id="t-howToUseBtn" type="button" class="t-help-btn">How to use</button>
+    <button id="t-howToUseBtn" type="button" class="t-help-btn">
+      How to use
+    </button>
   </div>
   <div class="t-card">
     <div class="t-tabs">
-      <button id="t-tabExtractBtn" type="button" class="t-tab active">📐 Extract Points</button>
-      <button id="t-tabColorBtn" type="button" class="t-tab">🎨 Color Picker</button>
+      <button id="t-tabExtractBtn" type="button" class="t-tab active">
+        📐 Extract Points
+      </button>
+      <button id="t-tabColorBtn" type="button" class="t-tab">
+        🎨 Color Picker
+      </button>
     </div>
   </div>
 
@@ -14,12 +20,16 @@
   <div id="t-pageExtract" class="t-page">
     <div class="t-card">
       <label for="t-skippedPoints">Skipped points</label>
-      <input id="t-skippedPoints" type="text" value="X,Y,X1,Y1">
+      <input id="t-skippedPoints" type="text" value="X,Y,X1,Y1" />
     </div>
 
     <div class="t-card t-outputCard">
       <label for="t-output">Output</label>
-      <textarea id="t-output" placeholder="Coordinates will appear here..." readonly></textarea>
+      <textarea
+        id="t-output"
+        placeholder="Coordinates will appear here..."
+        readonly
+      ></textarea>
 
       <div class="t-btnRow">
         <button id="t-getData">Get Data</button>
@@ -32,7 +42,120 @@
   <div id="t-pageColor" class="t-page hidden">
     <div class="t-card t-center">
       <div id="t-swatch" class="t-swatch"></div>
-      <p class="t-hint">Color picker coming soon.</p>
+      <div class="c-card">
+        <div class="c-top-row">
+          <div class="c-swatch" id="c-swatch"></div>
+          <div class="c-fields">
+            <div class="c-field-row">
+              <input type="text" id="c-rgb01Input" spellcheck="false" />
+              <button class="c-copy-btn" data-copy="c-rgb01Input" title="Copy">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="9" y="9" width="12" height="12" rx="2" />
+                  <path
+                    d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div class="c-field-row">
+              <input type="text" id="c-hexInput" spellcheck="false" />
+              <button class="c-copy-btn" data-copy="c-hexInput" title="Copy">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="9" y="9" width="12" height="12" rx="2" />
+                  <path
+                    d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <button
+            class="c-eyedrop-btn"
+            id="c-eyedropBtn"
+            title="Pick color from screen"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="m2 22 1-4 9.5-9.5" />
+              <path d="M17 3a2.85 2.83 0 1 1 4 4L18 10l-4-4Z" />
+              <path d="m3 21 4 1" />
+            </svg>
+          </button>
+          <input
+            type="color"
+            id="c-nativeColorInput"
+            style="
+              position: absolute;
+              width: 1px;
+              height: 1px;
+              opacity: 0;
+              pointer-events: none;
+            "
+            tabindex="-1"
+          />
+        </div>
+
+        <div class="c-channels">
+          <label for="c-rNum">R</label>
+          <input type="number" id="c-rNum" min="0" max="1" step="0.001" />
+          <div class="c-slider-track" id="c-rTrack">
+            <div class="c-grad" id="c-rGrad"></div>
+            <input type="range" id="c-rRange" min="0" max="1" step="0.001" />
+          </div>
+
+          <label for="c-gNum">G</label>
+          <input type="number" id="c-gNum" min="0" max="1" step="0.001" />
+          <div class="c-slider-track" id="c-gTrack">
+            <div class="c-grad" id="c-gGrad"></div>
+            <input type="range" id="c-gRange" min="0" max="1" step="0.001" />
+          </div>
+
+          <label for="c-bNum">B</label>
+          <input type="number" id="c-bNum" min="0" max="1" step="0.001" />
+          <div class="c-slider-track" id="c-bTrack">
+            <div class="c-grad" id="c-bGrad"></div>
+            <input type="range" id="c-bRange" min="0" max="1" step="0.001" />
+          </div>
+
+          <label for="c-aNum">A</label>
+          <input type="number" id="c-aNum" min="0" max="1" step="0.001" />
+          <div class="c-slider-track c-checker" id="c-aTrack">
+            <div class="c-grad" id="c-aGrad"></div>
+            <input type="range" id="c-aRange" min="0" max="1" step="0.001" />
+          </div>
+        </div>
+
+        <div class="c-sv-area" id="c-svArea">
+          <div class="c-sv-white"></div>
+          <div class="c-sv-black"></div>
+          <div class="c-sv-cursor" id="c-svCursor"></div>
+        </div>
+
+        <div class="c-hue-track" id="c-hueTrack">
+          <div class="c-hue-cursor" id="c-hueCursor"></div>
+        </div>
+
+        <div class="c-alpha-track" id="c-alphaTrack">
+          <div class="c-alpha-grad" id="c-alphaGrad"></div>
+          <div class="c-alpha-cursor" id="c-alphaCursor"></div>
+        </div>
+      </div>
+
+      <div class="c-toast" id="c-toast">Copied</div>
     </div>
   </div>
 
