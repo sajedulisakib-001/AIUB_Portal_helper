@@ -6,21 +6,14 @@ async function calculateSHA256(buffer) {
         .join("");
 }
 
-
-async function getServerHash() {
-    const response = await fetch(
-        "https://your-server.com/api/file-hash",
-        {
-            cache: "no-store"
-        }
-    );
-
-    if (!response.ok)
-        throw new Error("Failed to get server hash");
-
-    const data = await response.json();
-
-    return data.hash.trim().toLowerCase();
+async function checkHash(value) {
+  const response = await fetch("https://tools-integrity-checker.wasmer.app/check", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ string: value }),
+  });
+  const data = await response.json();
+  return data.match; // true or false
 }
 
 
@@ -43,10 +36,10 @@ async function validateFile(filePath) {
         const localHash = await calculateSHA256(buffer);
 
         // Get expected hash
-        // const serverHash = await getServerHash();
+        const isValid = await checkHash(localHash);
 
         // Compare
-        if (localHash === "865041d13c01911fa7af4d5e6595de31b4acfef2425fca681f7ca5130cc31dc6") {
+        if (isValid) {
 
             console.log("✓ File integrity verified");
 
@@ -67,4 +60,4 @@ async function validateFile(filePath) {
     }
 }
 
-export { calculateSHA256, getServerHash, validateFile };
+export { validateFile };
