@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Tool Validation Errors</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      background: #f5f7fa;
+      color: #212529;
+      line-height: 1.6;
+    }
+
+    .container {
+      width: min(950px, calc(100% - 32px));
+      margin: 40px auto;
+    }
+
+    .header {
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 12px;
+      padding: 28px 30px;
+      margin-bottom: 22px;
+    }
+
+    .header h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      color: #212529;
+    }
+
+    .header p {
+      margin: 0;
+      color: #6c757d;
+    }
+
+    .section {
+      background: #ffffff;
+      border: 1px solid #dee2e6;
+      border-radius: 12px;
+      padding: 25px 28px;
+      margin-bottom: 20px;
+    }
+
+    .section h2 {
+      margin-top: 0;
+      font-size: 21px;
+      color: #343a40;
+    }
+
+    .section h3 {
+      font-size: 17px;
+      margin-top: 24px;
+      margin-bottom: 8px;
+      color: #495057;
+    }
+
+    .section p {
+      margin: 8px 0;
+    }
+
+    .error {
+      border-left: 4px solid #dc3545;
+      background: #fff5f5;
+      padding: 15px 17px;
+      margin: 15px 0;
+      border-radius: 6px;
+    }
+
+    .error-title {
+      font-weight: 600;
+      color: #c82333;
+      margin-bottom: 5px;
+    }
+
+    .success {
+      border-left: 4px solid #198754;
+      background: #f0fff6;
+      padding: 15px 17px;
+      margin: 15px 0;
+      border-radius: 6px;
+    }
+
+    .info {
+      border-left: 4px solid #0d6efd;
+      background: #f1f7ff;
+      padding: 15px 17px;
+      margin: 15px 0;
+      border-radius: 6px;
+    }
+
+    code {
+      background: #f1f3f5;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", monospace;
+      font-size: 0.92em;
+    }
+
+    pre {
+      background: #212529;
+      color: #f8f9fa;
+      padding: 17px;
+      border-radius: 8px;
+      overflow-x: auto;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+
+    ul,
+    ol {
+      padding-left: 25px;
+    }
+
+    li {
+      margin: 7px 0;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 11px 12px;
+      border-bottom: 1px solid #dee2e6;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-required {
+      background: #ffe3e3;
+      color: #c92a2a;
+    }
+
+    .badge-optional {
+      background: #e7f5ff;
+      color: #1864ab;
+    }
+
+    .structure {
+      margin-top: 15px;
+    }
+
+    .footer {
+      text-align: center;
+      color: #868e96;
+      font-size: 13px;
+      padding: 15px 0 30px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="container">
+
+    <header class="header">
+      <h1>Tool Validation Errors</h1>
+      <p>
+        Documentation for the validation rules used when adding a new tool
+        to the extension.
+      </p>
+    </header>
+
+
+    <!-- ========================================================= -->
+    <!-- 1. OVERVIEW -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>1. How Tool Validation Works</h2>
+
+      <p>
+        When a new tool is added, the extension performs several validation
+        checks before storing the tool metadata.
+      </p>
+
+      <ol>
+        <li>The tool folder name is validated.</li>
+        <li>The tool's <code>metadata.json</code> file is loaded.</li>
+        <li>The metadata structure is validated.</li>
+        <li>Referenced JavaScript, HTML, and CSS files are checked.</li>
+        <li>JavaScript files are checked for the required <code>tool()</code> export.</li>
+        <li>Tool HTML is checked to make sure it does not contain executable
+          <code>&lt;script&gt;</code> tags.</li>
+      </ol>
+
+      <div class="info">
+        <strong>Important:</strong>
+        A validation failure causes the tool to be rejected and prevents its
+        metadata from being stored.
+      </div>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 2. FOLDER NAME -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>2. Tool Folder Name Validation</h2>
+
+      <p>
+        The folder name entered in the Settings page must represent exactly
+        one valid folder name.
+      </p>
+
+      <h3>Allowed characters</h3>
+
+      <ul>
+        <li>Uppercase letters: <code>A-Z</code></li>
+        <li>Lowercase letters: <code>a-z</code></li>
+        <li>Numbers: <code>0-9</code></li>
+        <li>Underscore: <code>_</code></li>
+        <li>Hyphen: <code>-</code></li>
+      </ul>
+
+      <p>
+        The validation pattern used by the extension is:
+      </p>
+
+      <pre>/^[A-Za-z0-9_-]+$/</pre>
+
+      <h3>Valid examples</h3>
+
+      <ul>
+        <li><code>calculator</code></li>
+        <li><code>color_picker</code></li>
+        <li><code>json-viewer</code></li>
+        <li><code>tool123</code></li>
+        <li><code>my_tool-2</code></li>
+      </ul>
+
+      <h3>Invalid examples</h3>
+
+      <ul>
+        <li><code>my tool</code> — contains a space</li>
+        <li><code>my/tool</code> — contains <code>/</code></li>
+        <li><code>my\tool</code> — contains <code>\</code></li>
+        <li><code>../tool</code> — contains invalid characters</li>
+        <li><code>tool.json</code> — contains <code>.</code></li>
+        <li><code>tool@home</code> — contains <code>@</code></li>
+      </ul>
+
+      <div class="error">
+        <div class="error-title">Validation Error</div>
+        Invalid folder names are rejected before the tool metadata is loaded.
+      </div>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 3. EMPTY -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>3. Empty Tool Name</h2>
+
+      <p>
+        An empty input is not accepted.
+      </p>
+
+      <div class="error">
+        <div class="error-title">Error message</div>
+        Please enter a tool folder name.
+      </div>
+
+      <p>
+        This also applies when the input contains only whitespace because the
+        input is trimmed before validation.
+      </p>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 4. DUPLICATE -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>4. Duplicate Tool</h2>
+
+      <p>
+        A tool cannot be added if its folder name already exists in the
+        configured tools list.
+      </p>
+
+      <div class="error">
+        <div class="error-title">Example</div>
+        If <code>calculator</code> already exists, attempting to add
+        <code>calculator</code> again will be rejected.
+      </div>
+
+      <p>
+        The extension displays:
+      </p>
+
+      <pre>"calculator" is already in your tools.</pre>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 5. TOOL STRUCTURE -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>5. Tool Directory Structure</h2>
+
+      <p>
+        After the folder name passes validation, the extension expects the
+        tool to exist inside the extension's tool directory.
+      </p>
+
+      <div class="structure">
+        <pre>
+app/
+└── tools/
+    └── your-tool/
+        ├── metadata.json
+        ├── entry.html
+        ├── script.js
+        └── style.css
+        </pre>
+      </div>
+
+      <p>
+        The exact filenames depend on the values defined in
+        <code>metadata.json</code>.
+      </p>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 6. METADATA -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>6. Metadata Validation</h2>
+
+      <p>
+        The extension first loads:
+      </p>
+
+      <pre>app/tools/&lt;tool-folder&gt;/metadata.json</pre>
+
+      <p>
+        If the file cannot be loaded or parsed as JSON, the tool is rejected.
+      </p>
+
+      <div class="error">
+        <div class="error-title">Metadata cannot be loaded</div>
+        The <code>metadata.json</code> file must exist and contain valid JSON.
+      </div>
+
+      <h3>Metadata object</h3>
+
+      <p>
+        The parsed metadata must be an object. A missing or invalid metadata
+        object causes validation to fail.
+      </p>
+
+      <div class="error">
+        <div class="error-title">Invalid metadata</div>
+        The metadata value is missing or is not an object.
+      </div>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 7. RUN ACTION -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>7. JavaScript Action Validation</h2>
+
+      <p>
+        JavaScript validation is performed when:
+      </p>
+
+      <pre>metadata.actions.run</pre>
+
+      <p>
+        is enabled.
+      </p>
+
+      <h3>7.1 Missing or invalid script property</h3>
+
+      <p>
+        When <code>actions.run</code> is enabled, the metadata must contain:
+      </p>
+
+      <pre>{
+  "actions": {
+    "run": true,
+    "script": "script"
+  }
+}</pre>
+
+      <p>
+        The <code>script</code> value must be a string.
+      </p>
+
+      <div class="error">
+        <div class="error-title">Validation fails when</div>
+        <ul>
+          <li><code>actions.script</code> is missing.</li>
+          <li><code>actions.script</code> is not a string.</li>
+        </ul>
+      </div>
+
+
+      <h3>7.2 Missing entry</h3>
+
+      <p>
+        When the run action is enabled, <code>metadata.entry</code> must also
+        exist.
+      </p>
+
+      <div class="error">
+        <div class="error-title">Validation fails when</div>
+        <code>metadata.entry</code> is missing or evaluates to a false value.
+      </div>
+
+
+      <h3>7.3 JavaScript file does not exist</h3>
+
+      <p>
+        The script path is constructed as:
+      </p>
+
+      <pre>app/tools/&lt;tool-folder&gt;/&lt;actions.script&gt;.js</pre>
+
+      <p>
+        If that file cannot be fetched, validation fails.
+      </p>
+
+
+      <h3>7.4 Invalid JavaScript file</h3>
+
+      <p>
+        The JavaScript file is passed through the extension's
+        <code>validateScript()</code> validation.
+      </p>
+
+      <div class="error">
+        <div class="error-title">Validation fails when</div>
+        The JavaScript file does not pass <code>validateScript()</code>.
+      </div>
+
+
+      <h3>7.5 Missing tool() function</h3>
+
+      <p>
+        The JavaScript module must export a function named
+        <code>tool</code>.
+      </p>
+
+      <p>
+        Example:
+      </p>
+
+      <pre>export function tool() {
+  // Tool implementation
+}</pre>
+
+      <p>
+        The following is invalid:
+      </p>
+
+      <pre>export function start() {
+  // ...
+}</pre>
+
+      <div class="error">
+        <div class="error-title">Validation fails when</div>
+        The imported JavaScript module does not contain
+        <code>tool</code> as a function.
+      </div>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 8. ENTRY HTML -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>8. Entry HTML Validation</h2>
+
+      <p>
+        If <code>metadata.entry</code> exists, the extension expects an HTML
+        file at:
+      </p>
+
+      <pre>app/tools/&lt;tool-folder&gt;/&lt;metadata.entry&gt;.html</pre>
+
+
+      <h3>8.1 Invalid entry type</h3>
+
+      <p>
+        The <code>entry</code> property must be a string.
+      </p>
+
+      <div class="error">
+        <div class="error-title">Validation fails when</div>
+        <code>metadata.entry</code> exists but is not a string.
+      </div>
+
+
+      <h3>8.2 Entry HTML does not exist</h3>
+
+      <p>
+        If the referenced HTML file cannot be loaded, the tool is rejected.
+      </p>
+
+      <div class="error">
+        <div class="error-title">Example</div>
+
+        If metadata contains:
+        <pre>{
+  "entry": "index"
+}</pre>
+
+        the following file must exist:
+
+        <pre>app/tools/my-tool/index.html</pre>
+      </div>
+
+
+      <h3>8.3 Script tags are not allowed</h3>
+
+      <p>
+        Tool HTML must not contain executable
+        <code>&lt;script&gt;</code> tags.
+      </p>
+
+      <p>
+        The validator removes HTML comments before checking for script tags.
+        Therefore, script tags inside comments are ignored.
+      </p>
+
+      <h3>Allowed</h3>
+
+      <pre>&lt;!--
+&lt;script&gt;
+  example();
+&lt;/script&gt;
+--&gt;</pre>
+
+      <h3>Not allowed</h3>
+
+      <pre>&lt;script src="tool.js"&gt;&lt;/script&gt;</pre>
+
+      <pre>&lt;script&gt;
+  console.log("Hello");
+&lt;/script&gt;</pre>
+
+      <div class="error">
+        <div class="error-title">Validation fails</div>
+        A real <code>&lt;script&gt;</code> opening tag is detected outside
+        HTML comments.
+      </div>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 9. CSS -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>9. CSS Action Validation</h2>
+
+      <p>
+        CSS validation is performed when:
+      </p>
+
+      <pre>metadata.actions.css</pre>
+
+      <p>
+        exists.
+      </p>
+
+
+      <h3>9.1 CSS value must be a string</h3>
+
+      <p>
+        The CSS property must contain a string identifying the CSS file.
+      </p>
+
+      <div class="error">
+        <div class="error-title">Validation fails when</div>
+        <code>actions.css</code> exists but is not a string.
+      </div>
+
+
+      <h3>9.2 CSS file does not exist</h3>
+
+      <p>
+        The validator expects the file at:
+      </p>
+
+      <pre>app/tools/&lt;tool-folder&gt;/&lt;actions.css&gt;.css</pre>
+
+      <p>
+        If the file cannot be loaded, validation fails.
+      </p>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 10. COMPLETE EXAMPLE -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>10. Example of Valid Metadata</h2>
+
+      <p>
+        A tool using run, entry, and CSS actions can have metadata similar to:
+      </p>
+
+      <pre>{
+  "name": "Example Tool",
+  "entry": "index",
+  "actions": {
+    "run": true,
+    "script": "script",
+    "css": "style"
+  }
+}</pre>
+
+      <p>
+        With the following files:
+      </p>
+
+      <pre>
+app/
+└── tools/
+    └── example-tool/
+        ├── metadata.json
+        ├── index.html
+        ├── script.js
+        └── style.css
+      </pre>
+
+      <p>
+        The JavaScript module must also provide:
+      </p>
+
+      <pre>export function tool() {
+  // Tool code
+}</pre>
+
+      <div class="success">
+        <strong>Valid tool:</strong>
+        If all referenced files exist and all validation rules pass, the tool
+        metadata can be stored successfully.
+      </div>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 11. ERROR SUMMARY -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>11. Validation Error Summary</h2>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Validation</th>
+              <th>Failure Condition</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>Folder name</td>
+              <td>Empty or contains characters other than A-Z, a-z, 0-9, _ or -.</td>
+            </tr>
+
+            <tr>
+              <td>Duplicate tool</td>
+              <td>The same folder name already exists.</td>
+            </tr>
+
+            <tr>
+              <td>Metadata</td>
+              <td><code>metadata.json</code> cannot be loaded or parsed.</td>
+            </tr>
+
+            <tr>
+              <td>Metadata object</td>
+              <td>Metadata is missing or is not an object.</td>
+            </tr>
+
+            <tr>
+              <td>Run action</td>
+              <td><code>actions.script</code> is missing or is not a string.</td>
+            </tr>
+
+            <tr>
+              <td>Run entry</td>
+              <td><code>metadata.entry</code> is missing when run is enabled.</td>
+            </tr>
+
+            <tr>
+              <td>JavaScript file</td>
+              <td>The referenced <code>.js</code> file does not exist.</td>
+            </tr>
+
+            <tr>
+              <td>JavaScript validation</td>
+              <td>The script fails <code>validateScript()</code>.</td>
+            </tr>
+
+            <tr>
+              <td>tool() export</td>
+              <td>The JavaScript module does not export <code>tool</code> as a function.</td>
+            </tr>
+
+            <tr>
+              <td>Entry HTML</td>
+              <td>The referenced <code>.html</code> file does not exist.</td>
+            </tr>
+
+            <tr>
+              <td>HTML script tag</td>
+              <td>A real <code>&lt;script&gt;</code> tag exists outside comments.</td>
+            </tr>
+
+            <tr>
+              <td>CSS property</td>
+              <td><code>actions.css</code> exists but is not a string.</td>
+            </tr>
+
+            <tr>
+              <td>CSS file</td>
+              <td>The referenced <code>.css</code> file does not exist.</td>
+            </tr>
+
+            <tr>
+              <td>Duplicate metadata</td>
+              <td>The tool path already exists in <code>tools-metadata</code>.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+
+    <!-- ========================================================= -->
+    <!-- 12. QUICK CHECKLIST -->
+    <!-- ========================================================= -->
+
+    <section class="section">
+      <h2>12. Before Adding a Tool</h2>
+
+      <ul>
+        <li>Use only letters, numbers, <code>_</code>, and <code>-</code> in the folder name.</li>
+        <li>Do not use spaces.</li>
+        <li>Do not use <code>/</code> or <code>\</code>.</li>
+        <li>Make sure the tool does not already exist.</li>
+        <li>Make sure <code>metadata.json</code> exists and contains valid JSON.</li>
+        <li>If <code>actions.run</code> is enabled, provide <code>actions.script</code>.</li>
+        <li>If <code>actions.run</code> is enabled, provide <code>entry</code>.</li>
+        <li>Make sure the referenced JavaScript file exists.</li>
+        <li>Make sure the JavaScript passes <code>validateScript()</code>.</li>
+        <li>Export a <code>tool()</code> function from the JavaScript module.</li>
+        <li>Make sure the entry HTML file exists.</li>
+        <li>Do not put executable <code>&lt;script&gt;</code> tags in tool HTML.</li>
+        <li>If CSS is specified, make sure the referenced CSS file exists.</li>
+      </ul>
+    </section>
+
+
+    <footer class="footer">
+      Tool Validation Documentation
+    </footer>
+
+  </main>
+
+</body>
+</html>

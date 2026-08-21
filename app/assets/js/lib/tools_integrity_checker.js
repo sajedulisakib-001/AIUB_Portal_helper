@@ -17,7 +17,7 @@ async function checkHash(value) {
 }
 
 
-async function validateFile(filePath) {
+async function validateScript(filePath) {
 
     try {
 
@@ -60,4 +60,4 @@ async function validateFile(filePath) {
     }
 }
 
-export { validateFile };
+export { validateScript };

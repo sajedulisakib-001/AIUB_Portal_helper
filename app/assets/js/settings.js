@@ -183,10 +183,50 @@ async function addNewTool() {
  * Shows an error below the tool input.
  */
 function showToolError(message) {
+  let msg = message;
+  if (message === "VERROR") {
+    msg = `
+      Adding New tool Faild! Due to Velaidation Error!
+      <span class="info-icon text-info">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 16 16"
+                  width="16"
+                  height="16"
+                  fill="#fd350d"
+                >
+                  <path
+                    transform="scale(0.03125)"
+                    d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85 
+    c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786 
+    c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576 
+    c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765 
+    c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z"
+                  />
+                </svg>
+
+                <span class="tooltip-text">
+                  <p id="read-v-error">
+                    <u>Click here</u>
+                  </p>
+                  to read About Validation errors!
+                </span>
+              </span>
+      
+      `;
+  }
+
   const error = document.getElementById("toolError");
 
-  error.textContent = message;
+  error.textContent = msg;
   error.style.display = "block";
+  if (message === "VERROR") {
+    document.getElementById("read-v-error").addEventListener("click", () => {
+      chrome.tabs.create({
+        url: chrome.runtime.getURL("app/pages/other/validationError.html"),
+      });
+    });
+  }
 }
 
 /**
@@ -201,10 +241,15 @@ async function loadCurrentTools() {
 
   // Add missing default tools.
   if (missingTools.length > 0) {
-    await Promise.all(missingTools.map((tool) => storeMetadataInStorage(tool)));
-
-    // Get the updated tool list.
-    tools = await getAllToolPaths();
+    const isStored = await Promise.all(
+      missingTools.map((tool) => storeMetadataInStorage(tool)),
+    );
+    if (isStored) {
+      // Get the updated tool list.
+      tools = await getAllToolPaths();
+    } else {
+      showToolError("VERROR");
+    }
   }
 
   renderTools(tools);
@@ -457,4 +502,172 @@ function showSelectedTimeforT(time) {
   document.getElementById("minute").value = time.minute;
 
   document.getElementById("ampm").value = time.ampm;
+}
+
+// `tool` is the actual folder name and the tool nickname.
+async function storeMetadataInStorage(tool) {
+  const { ["tools-metadata"]: oldData = [] } =
+    await chrome.storage.local.get("tools-metadata");
+
+  const fetchData = async (tool) => {
+    const path = `app/tools/${tool}/metadata.json`;
+
+    try {
+      const response = await fetch(chrome.runtime.getURL(path));
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const json = await response.json();
+
+      return {
+        ...json,
+        path: tool,
+      };
+    } catch (error) {
+      console.error(`Error loading ${path}:`, error);
+      return null;
+    }
+  };
+
+  const newTool = await fetchData(tool);
+
+  if (!newTool) {
+    return false;
+  }
+
+  // Validate metadata and tool files.
+  const isValidTool = await validateAllFiles(newTool, tool);
+
+  if (!isValidTool) {
+    return false;
+  }
+
+  // Prevent the same tool folder from being added twice.
+  if (Array.isArray(oldData) && oldData.some((item) => item.path === tool)) {
+    return false;
+  }
+
+  await chrome.storage.local.set({
+    "tools-metadata": [...(Array.isArray(oldData) ? oldData : []), newTool],
+  });
+
+  return true;
+}
+
+async function validateAllFiles(metadata, path) {
+  if (!metadata || typeof metadata !== "object") {
+    return false;
+  }
+
+  if (!path || typeof path !== "string") {
+    return false;
+  }
+
+  const base = `app/tools/${path}`;
+  const actions = metadata.actions || {};
+
+  // Test whether a file exists and optionally return its content.
+  const test = async (filePath) => {
+    try {
+      const response = await fetch(chrome.runtime.getURL(filePath));
+
+      if (!response.ok) {
+        return [false, null];
+      }
+
+      return [true, await response.text()];
+    } catch (error) {
+      return [false, null];
+    }
+  };
+
+  // Detect real <script> tags while ignoring HTML comments.
+  const hasScript = (html) => {
+    if (typeof html !== "string") {
+      return false;
+    }
+
+    const withoutComments = html.replace(/<!--[\s\S]*?-->/g, "");
+
+    return /<script\b[^>]*>/i.test(withoutComments);
+  };
+
+  /*
+   * Validate JavaScript action
+   */
+  if (actions.run) {
+    if (!actions.script || typeof actions.script !== "string") {
+      return false;
+    }
+
+    if (!metadata.entry) {
+      return false;
+    }
+
+    const scriptPath = `${base}/${actions.script}.js`;
+
+    try {
+      const scriptExists = await test(scriptPath);
+
+      if (!scriptExists[0]) {
+        return false;
+      }
+
+      if (!validateScript(scriptPath)) {
+        return false;
+      }
+
+      const module = await import(chrome.runtime.getURL(scriptPath));
+
+      // Make sure tool() exists.
+      if (typeof module.tool !== "function") {
+        return false;
+      }
+    } catch (error) {
+      console.error(`Failed to load tool script: ${scriptPath}`, error);
+
+      return false;
+    }
+  }
+
+  /*
+   * Validate entry HTML
+   */
+  if (metadata.entry) {
+    if (typeof metadata.entry !== "string") {
+      return false;
+    }
+
+    const htmlPath = `${base}/${metadata.entry}.html`;
+    const data = await test(htmlPath);
+
+    if (!data[0]) {
+      return false;
+    }
+
+    // Tool HTML must not contain executable script tags.
+    if (hasScript(data[1])) {
+      return false;
+    }
+  }
+
+  /*
+   * Validate CSS action
+   */
+  if (actions.css) {
+    if (typeof actions.css !== "string") {
+      return false;
+    }
+
+    const cssPath = `${base}/${actions.css}.css`;
+    const cssExists = await test(cssPath);
+
+    if (!cssExists[0]) {
+      return false;
+    }
+  }
+
+  return true;
 }
