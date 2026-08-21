@@ -1,10 +1,10 @@
 {
-    "name": "GeoGebra Points to Gult",
-    "description": "This tool helps you to generate OpenGL glut code from Ploted Graph",
+    "name": "Test Tool",
+    "description": "",
     "version": "1.0.0",
     "author": "Sajedul Islam Sakib",
     "license": "GPL-3.0",
-    "host": "https://www.geogebra.org/classic",
+    "host": "https://www.google.com/",
     "entry": "index",
     "repository": {
         "type": "git",
