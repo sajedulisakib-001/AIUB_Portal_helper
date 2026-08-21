@@ -777,19 +777,19 @@ body {
 }
 .error-container {
     display: flex;
-    align-items: flex-start;
-    gap: 10px;
+    align-items: center;
+    gap: 15px;
 
     width: max-content;
     max-width: min(440px, calc(100vw - 24px));
 
     padding: 10px 14px;
 
-    background: #dc3545;
+    background: #f04556;
     color: #fff;
     border-radius: 8px;
 
-    font: 14px/1.4 system-ui, sans-serif;
+    font: 13px / 1.4 small-caption;
     box-sizing: border-box;
 
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
