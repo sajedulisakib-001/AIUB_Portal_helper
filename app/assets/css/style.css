@@ -763,3 +763,67 @@ body {
   border: 1px solid #f5c2c7;
   border-radius: 6px;
 }
+.error-notification {
+    position: fixed;
+    z-index: 9999;
+    width: 95vw;
+    left: 50%;
+    bottom: 16px;
+    transform: translateX(-50%);
+
+    display: none;
+}
+.error-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+
+    width: max-content;
+    max-width: min(440px, calc(100vw - 24px));
+
+    padding: 10px 14px;
+
+    background: #dc3545;
+    color: #fff;
+    border-radius: 8px;
+
+    font: 14px/1.4 system-ui, sans-serif;
+    box-sizing: border-box;
+
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.error-icon {
+    flex: 0 0 auto;
+
+    width: 18px;
+    height: 18px;
+
+    display: grid;
+    place-items: center;
+
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.error-message {
+    min-width: 0;
+
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+
+    line-clamp: 3;
+    -webkit-line-clamp: 3;
+
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+
+.error-message small {
+    display: block;
+    margin-top: 2px;
+    opacity: 0.85;
+}
