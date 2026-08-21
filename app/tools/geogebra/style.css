@@ -206,7 +206,6 @@ h2 {
   font-weight: 600;
   cursor: pointer;
   border: 1px solid #adadad;
-  transition: *background* 0.15s ease, transform 0.05s ease;
 }
 
 .t-container button:hover {
