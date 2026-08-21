@@ -203,12 +203,12 @@ async function fetchParsedData(action) {
  */
 async function deleteTool(toolName) {
   if (await deleteToolMetadata(toolName)) {
-    renderTools(tools);
+    loadCurrentTools();
   }
 }
 
 async function deleteToolMetadata(tool) {
-  if (DEFAULT_TOOLS.includes(tool)) return true;
+  if (defaultTools().includes(tool)) return false;
   const { ["tools-metadata"]: oldData = [] } =
     await chrome.storage.local.get("tools-metadata");
 

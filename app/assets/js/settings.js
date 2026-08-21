@@ -740,9 +740,15 @@ async function validateAllFiles(metadata, path) {
       }
 
       /*
-       * Validate JavaScript file.
+       * Validate JavaScript file integrity (hash check).
        */
-      if (!validateScript(scriptPath)) {
+      const integrityChecker = await import(
+        chrome.runtime.getURL(
+          "app/assets/js/lib/tools_integrity_checker.js",
+        )
+      );
+
+      if (!(await integrityChecker.validateScript(scriptPath))) {
         return {
           success: false,
           error: "SCRIPT_VALIDATION_FAILED",
