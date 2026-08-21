@@ -3,9 +3,10 @@
  * app/assets/css/style.css: .routine-item, #unlocked, #courseListContainer).
  *
  * Sized to fit entirely inside #tools-container with no scrolling: every
- * element below has an explicit, budgeted height instead of relying on
- * the popup's available space, so nothing overflows the 500x600 popup.
+ * element below has an explicit, budgeted height instead of relying on the
+ * popup's available space, so nothing overflows the 500x600 popup.
  */
+
 :root {
   --ink: #16181c;
   --sub: #6b7178;
@@ -24,7 +25,6 @@
   box-sizing: border-box;
 }
 
-
 h2 {
   margin-left: 20px;
   font-size: 20px;
@@ -33,13 +33,13 @@ h2 {
   letter-spacing: -0.2px;
 }
 
-
 .t-container {
   padding: 12px 14px;
   font-family: inherit;
 }
 
 /* Header */
+
 .t-header {
   display: flex;
   align-items: center;
@@ -57,7 +57,6 @@ h2 {
 
 .t-help-btn {
   flex-shrink: 0;
-
   margin-top: 0;
   padding: 5px 12px;
   font-size: 11px;
@@ -71,7 +70,6 @@ h2 {
 #t-howToUseBtn {
   width: 120px;
   margin-right: 20px;
-
 }
 
 .t-help-btn:hover {
@@ -79,6 +77,7 @@ h2 {
 }
 
 /* Segmented tab control */
+
 .t-tabs {
   display: flex;
   border-radius: 8px;
@@ -92,7 +91,6 @@ h2 {
   margin: 0;
   padding: 7px 6px;
   border-radius: 6px;
-
   font-size: 11.5px;
   font-weight: 600;
 }
@@ -113,6 +111,7 @@ h2 {
 }
 
 /* Pages */
+
 .t-page {
   display: flex;
   flex-direction: column;
@@ -125,6 +124,7 @@ h2 {
 }
 
 /* Cards -- match the app's routine-item / course-list card language */
+
 .t-card {
   background: #ffffff;
   border: 1px solid #e3e8f0;
@@ -172,7 +172,9 @@ h2 {
 
 /* Output card: fixed-height textarea sized to fit the popup with no
  * page-level scrolling. Long output scrolls inside the textarea itself
- * (normal textarea behavior), not the tools page. */
+ * (normal textarea behavior), not the tools page.
+ */
+
 .t-outputCard textarea {
   height: 170px;
   resize: none;
@@ -204,7 +206,7 @@ h2 {
   font-weight: 600;
   cursor: pointer;
   border: 1px solid #adadad;
-  transition: background 0.15s ease, transform 0.05s ease;
+  transition: *background* 0.15s ease, transform 0.05s ease;
 }
 
 .t-container button:hover {
@@ -225,6 +227,7 @@ h2 {
 }
 
 /* Color picker placeholder */
+
 .t-card.t-center {
   text-align: center;
   padding: 16px 12px;
@@ -247,6 +250,7 @@ h2 {
 }
 
 /* Status line */
+
 .t-status {
   margin-top: 6px;
   min-height: 14px;
@@ -255,73 +259,150 @@ h2 {
   text-align: center;
 }
 
+
+/* =========================================================
+   COLOR PICKER
+   ONLY .c-* RULES BELOW WERE CHANGED
+   Chromium only
+   Designed for 448x490
+   ========================================================= */
+
 .c-card {
   width: 100%;
-  max-width: 520px;
+  max-width: none;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  padding: 10px;
+
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 28px 26px 30px;
-  box-shadow: 0 1px 2px rgba(20, 20, 30, .04), 0 12px 32px -16px rgba(20, 20, 30, .12);
+  border-radius: 12px;
+
+  box-shadow:
+    0 1px 2px rgba(20, 20, 30, 0.04),
+    0 8px 24px -14px rgba(20, 20, 30, 0.12);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
 }
 
+
+/* ---------------------------------------------------------
+   TOP ROW
+   --------------------------------------------------------- */
 
 .c-top-row {
   display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  margin-bottom: 18px;
+  flex: 0 0 auto;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 9px;
+
+  align-items: center;
+
+  margin-bottom: 8px;
 }
 
+
+/* ---------------------------------------------------------
+   COLOR SWATCH
+   --------------------------------------------------------- */
+
 .c-swatch {
-  width: 62px;
-  height: 62px;
-  border-radius: 10px;
+  position: relative;
+
+  width: 52px;
+  height: 52px;
+
+  flex: 0 0 52px;
+
+  border-radius: 8px;
+
   border: 1px solid var(--line-strong);
-  flex-shrink: 0;
+
   background-image:
     linear-gradient(45deg, #ccc 25%, transparent 25%),
     linear-gradient(-45deg, #ccc 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #ccc 75%),
     linear-gradient(-45deg, transparent 75%, #ccc 75%);
-  background-size: 14px 14px;
-  background-position: 0 0, 0 7px, 7px -7px, -7px 0px;
-  position: relative;
+
+  background-size: 12px 12px;
+
+  background-position:
+    0 0,
+    0 6px,
+    6px -6px,
+    -6px 0;
+
   overflow: hidden;
 }
 
 .c-swatch::after {
   content: "";
+
   position: absolute;
+
   inset: 0;
+
   background: var(--swatch-color);
 }
 
+
+/* ---------------------------------------------------------
+   COLOR TEXT FIELDS
+   --------------------------------------------------------- */
+
 .c-fields {
-  flex: 1;
+  flex: 1 1 auto;
+
+  min-width: 0;
+
   display: flex;
   flex-direction: column;
-  gap: 8px;
+
+  gap: 5px;
 }
 
 .c-field-row {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
   display: flex;
   align-items: center;
-  gap: 6px;
-  position: relative;
+
+  gap: 5px;
 }
 
 .c-field-row input {
   width: 100%;
+  min-width: 0;
+
   border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  padding: 9px 34px 9px 12px;
+
+  border-radius: 7px;
+
+  padding: 6px 28px 6px 9px;
+
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 11px;
+
+  line-height: 1.2;
+
   color: var(--ink);
+
   background: var(--panel);
+
   outline: none;
-  transition: border-color .12s;
+
+  transition: border-color 0.12s, background 0.12s;
 }
 
 .c-field-row input:focus {
@@ -329,65 +410,153 @@ h2 {
   background: #fff;
 }
 
-.c-copy-btn,
-.c-eyedrop-btn {
+
+/* ---------------------------------------------------------
+   COPY BUTTON
+   --------------------------------------------------------- */
+
+.c-copy-btn {
   position: absolute;
-  right: 8px;
+
+  right: 6px;
   top: 50%;
+
   transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 2px;
+
+  width: auto !important;
+
+  margin: 0 !important;
+  padding: 2px !important;
+
   color: var(--sub);
+
+  background: transparent !important;
+
+  border: none !important;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  cursor: pointer;
+
   border-radius: 4px;
+
+  box-shadow: none !important;
 }
 
-.c-copy-btn:hover,
-.c-eyedrop-btn:hover {
+.c-copy-btn:hover {
   color: var(--ink);
-  background: #eceef1;
+
+  background: #eceef1 !important;
 }
 
-.c-copy-btn svg,
-.c-eyedrop-btn svg {
-  width: 15px;
-  height: 15px;
+.c-copy-btn svg {
+  width: 13px;
+  height: 13px;
 }
+
+
+/* ---------------------------------------------------------
+   EYEDROPPER
+   --------------------------------------------------------- */
 
 .c-eyedrop-btn {
   position: static;
+
+  width: auto !important;
+
+  flex: 0 0 auto;
+
+  margin-left: 2px !important;
+
+  padding: 2px !important;
+
   transform: none;
-  margin-left: 2px;
+
+  color: var(--sub);
+
+  background: transparent !important;
+
+  border: none !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  border-radius: 4px;
+
+  box-shadow: none !important;
 }
 
+.c-eyedrop-btn:hover {
+  color: var(--ink);
+
+  background: #eceef1 !important;
+}
+
+.c-eyedrop-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+
+/* ---------------------------------------------------------
+   RGB / RGBA CHANNELS
+   --------------------------------------------------------- */
+
 .c-channels {
+  flex: 0 0 auto;
+
+  width: 100%;
+  min-width: 0;
+
   display: grid;
-  grid-template-columns: 26px 66px 1fr;
-  row-gap: 9px;
-  column-gap: 10px;
+
+  grid-template-columns:
+    19px
+    54px
+    minmax(0, 1fr);
+
+  row-gap: 5px;
+
+  column-gap: 6px;
+
   align-items: center;
-  margin-bottom: 20px;
+
+  margin-bottom: 8px;
 }
 
 .c-channels label {
-  font-size: 12px;
+  font-size: 10px;
+
   font-weight: 700;
+
   color: var(--sub);
+
   text-align: center;
 }
 
 .c-channels input[type="number"] {
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  padding: 7px 8px;
-  font-family: var(--mono);
-  font-size: 13px;
   width: 100%;
+  min-width: 0;
+
+  border: 1px solid var(--line-strong);
+
+  border-radius: 6px;
+
+  padding: 4px 6px;
+
+  font-family: var(--mono);
+
+  font-size: 11px;
+
+  line-height: 1.2;
+
   outline: none;
+
   background: var(--panel);
 }
 
@@ -396,274 +565,359 @@ h2 {
   background: #fff;
 }
 
+
+/* ---------------------------------------------------------
+   RGB SLIDER
+   --------------------------------------------------------- */
+
 .c-slider-track {
   position: relative;
-  height: 22px;
-  border-radius: 11px;
+
+  width: 100%;
+  min-width: 0;
+
+  height: 18px;
+
+  border-radius: 9px;
+
   border: 1px solid var(--line-strong);
+
   display: flex;
   align-items: center;
+
+  overflow: hidden;
 }
 
-.c-slider-track.checker {
+.c-slider-track.c-checker {
   background-image:
     linear-gradient(45deg, #ccc 25%, transparent 25%),
     linear-gradient(-45deg, #ccc 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #ccc 75%),
     linear-gradient(-45deg, transparent 75%, #ccc 75%);
-  background-size: 12px 12px;
-  background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+
+  background-size: 10px 10px;
+
+  background-position:
+    0 0,
+    0 5px,
+    5px -5px,
+    -5px 0;
 }
 
 .c-slider-track .c-grad {
   position: absolute;
+
   inset: 0;
-  border-radius: 10px;
+
+  border-radius: 8px;
+
   pointer-events: none;
 }
 
 .c-slider-track input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
+
   width: 100%;
   height: 100%;
+
   background: transparent;
+
   margin: 0;
+
+  padding: 0;
+
   position: relative;
+
   z-index: 2;
+
+  cursor: pointer;
 }
+
+
+/* Chromium slider thumb */
 
 .c-slider-track input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 16px;
-  height: 26px;
-  border-radius: 5px;
-  background: #fff;
-  border: 1px solid var(--line-strong);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
-  cursor: pointer;
-  margin-top: 0;
-}
 
-.c-slider-track input[type="range"]::-moz-range-thumb {
-  width: 16px;
-  height: 26px;
-  border-radius: 5px;
+  width: 14px;
+  height: 22px;
+
+  border-radius: 4px;
+
   background: #fff;
+
   border: 1px solid var(--line-strong);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .25);
+
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.25);
+
   cursor: pointer;
 }
 
-.c-slider-track input[type="range"]::-moz-range-track {
-  background: transparent;
-}
+
+/* ---------------------------------------------------------
+   SATURATION / VALUE
+   --------------------------------------------------------- */
 
 .c-sv-area {
   position: relative;
+
+  flex: 1 1 auto;
+
   width: 100%;
-  height: 260px;
-  border-radius: 10px;
+
+  min-width: 0;
+  min-height: 70px;
+
+  height: auto;
+
+  margin-bottom: 7px;
+
+  border-radius: 8px;
+
   border: 1px solid var(--line-strong);
-  cursor: crosshair;
-  margin-bottom: 14px;
+
   background: #f00;
+
+  cursor: crosshair;
+
   touch-action: none;
+
   overflow: hidden;
 }
 
 .c-sv-white {
   position: absolute;
+
   inset: 0;
-  background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0));
+
+  background:
+    linear-gradient(
+      to right,
+      #fff,
+      rgba(255, 255, 255, 0)
+    );
+
+  pointer-events: none;
 }
 
 .c-sv-black {
   position: absolute;
+
   inset: 0;
-  background: linear-gradient(to top, #000, rgba(0, 0, 0, 0));
+
+  background:
+    linear-gradient(
+      to top,
+      #000,
+      rgba(0, 0, 0, 0)
+    );
+
+  pointer-events: none;
 }
 
 .c-sv-cursor {
   position: absolute;
-  width: 18px;
-  height: 18px;
+
+  width: 16px;
+  height: 16px;
+
   border-radius: 50%;
+
   border: 2px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .4), 0 1px 4px rgba(0, 0, 0, .5);
-  transform: translate(-50%, -50%);
+
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 1px 4px rgba(0, 0, 0, 0.5);
+
+  transform:
+    translate(-50%, -50%);
+
   pointer-events: none;
 }
 
+
+/* ---------------------------------------------------------
+   HUE
+   --------------------------------------------------------- */
+
 .c-hue-track {
   position: relative;
-  height: 22px;
-  border-radius: 11px;
+
+  flex: 0 0 18px;
+
+  width: 100%;
+
+  height: 18px;
+
+  margin-bottom: 6px;
+
+  border-radius: 9px;
+
   border: 1px solid var(--line-strong);
-  margin-bottom: 12px;
-  background: linear-gradient(to right,
-      #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+
+  background:
+    linear-gradient(
+      to right,
+      #ff0000,
+      #ffff00,
+      #00ff00,
+      #00ffff,
+      #0000ff,
+      #ff00ff,
+      #ff0000
+    );
+
   touch-action: none;
 }
 
 .c-hue-cursor {
   position: absolute;
+
   top: 50%;
-  width: 14px;
-  height: 26px;
-  border-radius: 5px;
+
+  width: 12px;
+  height: 22px;
+
+  border-radius: 4px;
+
   background: #fff;
+
   border: 1px solid var(--line-strong);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
-  transform: translate(-50%, -50%);
+
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3);
+
+  transform:
+    translate(-50%, -50%);
+
   pointer-events: none;
 }
 
+
+/* ---------------------------------------------------------
+   ALPHA
+   --------------------------------------------------------- */
+
 .c-alpha-track {
   position: relative;
-  height: 22px;
-  border-radius: 11px;
+
+  flex: 0 0 18px;
+
+  width: 100%;
+
+  height: 18px;
+
+  border-radius: 9px;
+
   border: 1px solid var(--line-strong);
+
   background-image:
     linear-gradient(45deg, #ccc 25%, transparent 25%),
     linear-gradient(-45deg, #ccc 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, #ccc 75%),
     linear-gradient(-45deg, transparent 75%, #ccc 75%);
-  background-size: 12px 12px;
-  background-position: 0 0, 0 6px, 6px -6px, -6px 0px;
+
+  background-size: 10px 10px;
+
+  background-position:
+    0 0,
+    0 5px,
+    5px -5px,
+    -5px 0;
+
   touch-action: none;
 }
 
 .c-alpha-grad {
   position: absolute;
+
   inset: 0;
-  border-radius: 10px;
+
+  border-radius: 8px;
+
   pointer-events: none;
 }
 
 .c-alpha-cursor {
   position: absolute;
+
   top: 50%;
-  width: 14px;
-  height: 26px;
-  border-radius: 5px;
+
+  width: 12px;
+  height: 22px;
+
+  border-radius: 4px;
+
   background: #fff;
+
   border: 1px solid var(--line-strong);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, .3);
-  transform: translate(-50%, -50%);
+
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3);
+
+  transform:
+    translate(-50%, -50%);
+
   pointer-events: none;
 }
 
+
+/* ---------------------------------------------------------
+   TOAST
+   --------------------------------------------------------- */
+
 .c-toast {
   position: fixed;
-  bottom: 24px;
+
+  bottom: 12px;
+
   left: 50%;
-  transform: translateX(-50%) translateY(10px);
+
+  transform:
+    translateX(-50%)
+    translateY(10px);
+
   background: var(--ink);
+
   color: #fff;
-  font-size: 13px;
-  padding: 8px 14px;
-  border-radius: 8px;
+
+  font-size: 11px;
+
+  padding: 6px 10px;
+
+  border-radius: 7px;
+
   opacity: 0;
+
   pointer-events: none;
-  transition: opacity .15s, transform .15s;
+
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+
+  z-index: 9999;
 }
 
 .c-toast.show {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+
+  transform:
+    translateX(-50%)
+    translateY(0);
 }
 
 
-.c-card {
-  width: 100%;
-  max-width: none;
-  height: 100%;
-  min-height: 0;
-  padding: 12px 14px;
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-
-
-.c-top-row {
-  flex: 0 0 auto;
-  gap: 10px;
-  margin-bottom: 10px;
-}
-
-.c-swatch {
-  width: 54px;
-  height: 54px;
-}
-
-.c-fields {
-  gap: 6px;
-}
-
-.c-field-row input {
-  padding: 7px 30px 7px 10px;
-  font-size: 12px;
-}
-
-.c-copy-btn svg,
-.c-eyedrop-btn svg {
-  width: 14px;
-  height: 14px;
-}
-
-.c-channels {
-  flex: 0 0 auto;
-  grid-template-columns: 20px 58px minmax(0, 1fr);
-  row-gap: 6px;
-  column-gap: 7px;
-  margin-bottom: 10px;
-}
-
-.c-channels input[type="number"] {
-  padding: 5px 6px;
-  font-size: 12px;
-}
-
-.c-slider-track,
-.c-hue-track,
-.c-alpha-track {
-  height: 20px;
-}
-
-.c-sv-area {
-  flex: 1 1 auto;
-  width: 100%;
-  min-height: 0;
-  height: auto;
-  margin-bottom: 9px;
-  border-radius: 8px;
-}
-
-.c-hue-track {
-  flex: 0 0 20px;
-  margin-bottom: 8px;
-}
-
-.c-alpha-track {
-  flex: 0 0 20px;
-}
-
-.c-toast {
-  bottom: 12px;
-}
+/* ---------------------------------------------------------
+   COLOR PICKER HEIGHT SAFETY
+   --------------------------------------------------------- */
 
 @media (max-height: 490px) {
 
-
   .c-card {
-    padding: 9px 11px;
+    padding: 8px 10px;
   }
-
-
 
   .c-top-row {
     margin-bottom: 7px;
@@ -672,18 +926,35 @@ h2 {
   .c-swatch {
     width: 48px;
     height: 48px;
+
+    flex-basis: 48px;
+  }
+
+  .c-fields {
+    gap: 4px;
+  }
+
+  .c-field-row input {
+    padding: 6px 28px 6px 9px;
+    font-size: 11px;
   }
 
   .c-channels {
     row-gap: 4px;
-    margin-bottom: 7px;
+    margin-bottom: 6px;
+  }
+
+  .c-channels input[type="number"] {
+    padding: 4px 5px;
+    font-size: 10px;
   }
 
   .c-sv-area {
-    margin-bottom: 7px;
+    min-height: 60px;
+    margin-bottom: 6px;
   }
 
   .c-hue-track {
-    margin-bottom: 6px;
+    margin-bottom: 5px;
   }
 }
