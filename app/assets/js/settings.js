@@ -352,20 +352,21 @@ function renderTools(tools) {
         `;
 
     const deleteButton = document.createElement("button");
-
+    const isDefault = DEFAULT_TOOLS.includes(tool);
+    deleteButton.disabled = isDefault;
     deleteButton.type = "button";
     deleteButton.textContent = "Delete";
 
     deleteButton.style.cssText = `
             border: none;
             background: transparent;
-            color: #dc3545;
+            color: ${isDefault?"#281313":"#dc3545"};
             font-size: 12px;
             font-weight: 500;
             padding: 4px 7px;
             margin-left: 8px;
             border-radius: 5px;
-            cursor: pointer;
+            cursor: ${isDefault?"not-allowed":"pointer"};
             flex-shrink: 0;
         `;
 
@@ -378,6 +379,7 @@ function renderTools(tools) {
     });
 
     deleteButton.addEventListener("click", async () => {
+      if(DEFAULT_TOOLS.includes(tool)) return;
       await deleteTool(tool);
     });
 
@@ -743,12 +745,35 @@ async function validateAllFiles(metadata, path) {
        * Validate JavaScript file integrity (hash check).
        */
       const integrityChecker = await import(
-        chrome.runtime.getURL(
-          "app/assets/js/lib/tools_integrity_checker.js",
-        )
+        chrome.runtime.getURL("app/assets/js/lib/tools_integrity_checker.js")
       );
 
-      if (!(await integrityChecker.validateScript(scriptPath))) {
+      showValidationStatus(
+        `Validating ${scriptPath}... This may take up to 10 seconds.`,
+      );
+
+      let validationResult;
+
+      try {
+        validationResult = await integrityChecker.validateScript(scriptPath);
+      } catch (error) {
+        console.error("Validation server error:", error);
+
+        hideValidationStatus();
+
+        return {
+          success: false,
+          error: "VALIDATION_SERVER_ERROR",
+          message:
+            "The validation server could not be reached. Please try again later.",
+          path: scriptPath,
+          details: error.message,
+        };
+      }
+
+      hideValidationStatus();
+
+      if (!validationResult) {
         return {
           success: false,
           error: "SCRIPT_VALIDATION_FAILED",
@@ -882,4 +907,18 @@ async function validateAllFiles(metadata, path) {
     message: "All tool validation checks passed.",
     path,
   };
+}
+
+function showValidationStatus(message) {
+  const status = document.getElementById("validationStatus");
+  const text = document.getElementById("validationStatusText");
+
+  text.textContent = message;
+  status.style.display = "flex";
+}
+
+function hideValidationStatus() {
+  const status = document.getElementById("validationStatus");
+
+  status.style.display = "none";
 }

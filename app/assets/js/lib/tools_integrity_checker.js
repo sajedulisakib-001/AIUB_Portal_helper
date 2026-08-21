@@ -6,14 +6,42 @@ async function calculateSHA256(buffer) {
         .join("");
 }
 
+// async function checkHash(value) {
+//   const response = await fetch("https://tools-integrity-checker.wasmer.app/check", {
+//     method: "POST",
+//     headers: { "Content-Type": "application/json" },
+//     body: JSON.stringify({ string: value }),
+//   });
+//   const data = await response.json();
+//   return data.match; // true or false
+// }
+
 async function checkHash(value) {
-  const response = await fetch("https://tools-integrity-checker.wasmer.app/check", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ string: value }),
-  });
-  const data = await response.json();
-  return data.match; // true or false
+  const controller = new AbortController();
+
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, 10000); // 10 seconds
+
+  try {
+    const response = await fetch(
+      "https://tools-integrity-checker.wasmer.app/check",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ string: value }),
+        signal: controller.signal,
+      }
+    );
+
+    const data = await response.json();
+    return data.match === true;
+  } catch (error) {
+    // Timeout or any network/server error
+    return false;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 
