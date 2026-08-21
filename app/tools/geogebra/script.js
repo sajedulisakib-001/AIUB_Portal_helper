@@ -11,8 +11,6 @@ export function tool(path) {
   const pageExtract = document.getElementById("t-pageExtract");
   const pageColor = document.getElementById("t-pageColor");
 
-  const swatch = document.getElementById("t-swatch");
-
   howToUseBtn.addEventListener("click", () => {
     chrome.tabs.create({
       url: chrome.runtime.getURL(`${path}other/help.html`),
@@ -21,6 +19,8 @@ export function tool(path) {
 
   // In-popup tab navigation -- switches which page is visible without
   // ever leaving the popup window (no new browser tab involved).
+  let colorPickerReady = false;
+
   function showPage(page) {
     const showingExtract = page === "extract";
 
@@ -30,7 +30,12 @@ export function tool(path) {
     tabColorBtn.classList.toggle("active", !showingExtract);
 
     status.textContent = "";
-    if(!showingExtract){
+
+    // Lazily wire up the color picker the first time its tab is opened.
+    // Re-running this on every tab switch would keep attaching new
+    // input/drag listeners on top of the old ones, so it only ever runs once.
+    if (!showingExtract && !colorPickerReady) {
+      colorPickerReady = true;
       setupColorPicker();
     }
   }
@@ -584,7 +589,6 @@ export function tool(path) {
       const parsed = hexToRgb(els.hexInput.value);
       if (parsed) {
         [r, g, b, a] = parsed;
-        if (els.hexInput.value.replace("#", "").length <= 6) a = a; // keep alpha if not specified stays as previous unless 8-digit
         syncHSVFromRGB();
       } else {
         render();
