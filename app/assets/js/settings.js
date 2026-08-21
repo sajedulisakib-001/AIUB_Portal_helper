@@ -115,9 +115,16 @@ async function addNewTool() {
    * Empty input.
    */
   if (folderName === "") {
-    showToolError("Please enter a tool folder name.");
+    const result = {
+      success: false,
+      error: "EMPTY_TOOL_NAME",
+      message: "Please enter a tool folder name.",
+      tool: folderName,
+    };
 
-    return false;
+    showToolError(result);
+
+    return result;
   }
 
   /*
@@ -133,9 +140,16 @@ async function addNewTool() {
   const validFolderName = /^[A-Za-z0-9_-]+$/;
 
   if (!validFolderName.test(folderName)) {
-    showToolError("Invalid folder name. Use only letters, numbers, _ or -.");
+    const result = {
+      success: false,
+      error: "INVALID_FOLDER_NAME",
+      message: "Invalid folder name. Use only letters, numbers, _ or -.",
+      tool: folderName,
+    };
 
-    return false;
+    showToolError(result);
+
+    return result;
   }
 
   /*
@@ -149,9 +163,16 @@ async function addNewTool() {
    * Prevent duplicate tools.
    */
   if (tools.includes(folderName)) {
-    showToolError(`"${folderName}" is already in your tools.`);
+    const validationResult = {
+      success: false,
+      error: "DUPLICATE_TOOL",
+      message: `"${folderName}" is already in your tools.`,
+      tool: folderName,
+    };
 
-    return false;
+    showToolError(validationResult);
+
+    return validationResult;
   }
 
   /*
@@ -176,57 +197,71 @@ async function addNewTool() {
    */
   renderTools(tools);
 
-  return true;
+  /*
+   * Store and validate the tool metadata.
+   *
+   * IMPORTANT:
+   * This preserves the existing logic where adding the folder
+   * and storing its metadata are separate operations.
+   */
+  const metadataResult = await storeMetadataInStorage(folderName);
+
+  /*
+   * If metadata validation failed, return the actual reason.
+   */
+  if (!metadataResult.success) {
+    showToolError(metadataResult);
+
+    return metadataResult;
+  }
+
+  /*
+   * Everything succeeded.
+   */
+  return {
+    success: true,
+    error: null,
+    message: `Tool "${folderName}" was added successfully.`,
+    tool: folderName,
+    metadata: metadataResult.metadata,
+  };
 }
 
 /**
  * Shows an error below the tool input.
  */
-function showToolError(message) {
-  let msg = message;
-  if (message === "VERROR") {
-    msg = `
-      Adding New tool Faild! Due to Velaidation Error!
-      <span class="info-icon text-info">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 16 16"
-                  width="16"
-                  height="16"
-                  fill="#fd350d"
-                >
-                  <path
-                    transform="scale(0.03125)"
-                    d="M356.004,61.156c-81.37-81.47-213.377-81.551-294.848-0.182c-81.47,81.371-81.552,213.379-0.181,294.85 
-    c81.369,81.47,213.378,81.551,294.849,0.181C437.293,274.636,437.375,142.626,356.004,61.156z M237.6,340.786 
-    c0,3.217-2.607,5.822-5.822,5.822h-46.576c-3.215,0-5.822-2.605-5.822-5.822V167.885c0-3.217,2.607-5.822,5.822-5.822h46.576 
-    c3.215,0,5.822,2.604,5.822,5.822V340.786z M208.49,137.901c-18.618,0-33.766-15.146-33.766-33.765 
-    c0-18.617,15.147-33.766,33.766-33.766c18.619,0,33.766,15.148,33.766,33.766C242.256,122.755,227.107,137.901,208.49,137.901z"
-                  />
-                </svg>
-
-                <span class="tooltip-text">
-                  <p id="read-v-error">
-                    <u>Click here</u>
-                  </p>
-                  to read About Validation errors!
-                </span>
-              </span>
-      
-      `;
-  }
-
+function showToolError(result) {
   const error = document.getElementById("toolError");
 
-  error.textContent = msg;
-  error.style.display = "block";
-  if (message === "VERROR") {
-    document.getElementById("read-v-error").addEventListener("click", () => {
-      chrome.tabs.create({
-        url: chrome.runtime.getURL("app/pages/other/validationError.html"),
-      });
-    });
+  /*
+   * Normal string error.
+   */
+  if (typeof result === "string") {
+    error.textContent = result;
+    error.style.display = "block";
+    return;
   }
+
+  /*
+   * No error.
+   */
+  if (!result || result.success) {
+    error.style.display = "none";
+    return;
+  }
+
+  /*
+   * Display actual validation error.
+   */
+  error.innerHTML = `
+    <strong>Tool Validation Failed</strong><br>
+    ${result.message}
+    ${result.path ? `<br><small>Path: ${result.path}</small>` : ""}
+  `;
+
+  error.style.display = "block";
+
+  console.error("Tool validation failed:", result);
 }
 
 /**
@@ -241,14 +276,25 @@ async function loadCurrentTools() {
 
   // Add missing default tools.
   if (missingTools.length > 0) {
-    const isStored = await Promise.all(
+    const results = await Promise.all(
       missingTools.map((tool) => storeMetadataInStorage(tool)),
     );
-    if (isStored) {
+
+    /*
+     * Check whether every missing tool was stored.
+     */
+    const failed = results.find((result) => !result.success);
+
+    if (!failed) {
       // Get the updated tool list.
       tools = await getAllToolPaths();
     } else {
-      showToolError("VERROR");
+      /*
+       * Show the actual validation error.
+       */
+      showToolError(failed);
+
+      console.error("Failed to add tool:", failed);
     }
   }
 
@@ -527,48 +573,93 @@ async function storeMetadataInStorage(tool) {
       };
     } catch (error) {
       console.error(`Error loading ${path}:`, error);
+
       return null;
     }
   };
 
   const newTool = await fetchData(tool);
 
+  /*
+   * Metadata file could not be loaded.
+   */
   if (!newTool) {
-    return false;
+    return {
+      success: false,
+      error: "METADATA_LOAD_FAILED",
+      message: `Could not load metadata.json for tool "${tool}".`,
+      tool,
+    };
   }
 
-  // Validate metadata and tool files.
-  const isValidTool = await validateAllFiles(newTool, tool);
+  /*
+   * Validate metadata and all referenced tool files.
+   */
+  const validation = await validateAllFiles(newTool, tool);
 
-  if (!isValidTool) {
-    return false;
+  if (!validation.success) {
+    return validation;
   }
 
-  // Prevent the same tool folder from being added twice.
+  /*
+   * Prevent the same tool folder from being added twice.
+   */
   if (Array.isArray(oldData) && oldData.some((item) => item.path === tool)) {
-    return false;
+    return {
+      success: false,
+      error: "DUPLICATE_METADATA",
+      message: `Tool "${tool}" already exists in tools-metadata.`,
+      tool,
+    };
   }
 
+  /*
+   * Save the validated tool metadata.
+   */
   await chrome.storage.local.set({
     "tools-metadata": [...(Array.isArray(oldData) ? oldData : []), newTool],
   });
 
-  return true;
+  return {
+    success: true,
+    error: null,
+    message: `Tool "${tool}" was successfully stored.`,
+    tool,
+    metadata: newTool,
+  };
 }
 
 async function validateAllFiles(metadata, path) {
+  /*
+   * Validate metadata object.
+   */
   if (!metadata || typeof metadata !== "object") {
-    return false;
+    return {
+      success: false,
+      error: "INVALID_METADATA",
+      message: "Tool metadata is missing or is not an object.",
+      path,
+    };
   }
 
+  /*
+   * Validate tool path.
+   */
   if (!path || typeof path !== "string") {
-    return false;
+    return {
+      success: false,
+      error: "INVALID_TOOL_PATH",
+      message: "Tool path is missing or is not a string.",
+      path,
+    };
   }
 
   const base = `app/tools/${path}`;
   const actions = metadata.actions || {};
 
-  // Test whether a file exists and optionally return its content.
+  /*
+   * Test whether a file exists and optionally return its content.
+   */
   const test = async (filePath) => {
     try {
       const response = await fetch(chrome.runtime.getURL(filePath));
@@ -583,7 +674,9 @@ async function validateAllFiles(metadata, path) {
     }
   };
 
-  // Detect real <script> tags while ignoring HTML comments.
+  /*
+   * Detect real <script> tags while ignoring HTML comments.
+   */
   const hasScript = (html) => {
     if (typeof html !== "string") {
       return false;
@@ -595,79 +688,189 @@ async function validateAllFiles(metadata, path) {
   };
 
   /*
+   * ============================================================
    * Validate JavaScript action
+   * ============================================================
    */
+
   if (actions.run) {
+    /*
+     * actions.script must exist.
+     */
     if (!actions.script || typeof actions.script !== "string") {
-      return false;
+      return {
+        success: false,
+        error: "INVALID_SCRIPT_PROPERTY",
+        message:
+          "actions.run is enabled, but actions.script is missing or is not a string.",
+        path,
+      };
     }
 
+    /*
+     * metadata.entry is required when run action is enabled.
+     */
     if (!metadata.entry) {
-      return false;
+      return {
+        success: false,
+        error: "MISSING_ENTRY",
+        message: "metadata.entry is required when actions.run is enabled.",
+        path,
+      };
     }
 
     const scriptPath = `${base}/${actions.script}.js`;
 
     try {
+      /*
+       * Check whether JavaScript file exists.
+       */
       const scriptExists = await test(scriptPath);
 
       if (!scriptExists[0]) {
-        return false;
+        return {
+          success: false,
+          error: "SCRIPT_NOT_FOUND",
+          message: `JavaScript file was not found: ${scriptPath}`,
+          path: scriptPath,
+        };
       }
 
+      /*
+       * Validate JavaScript file.
+       */
       if (!validateScript(scriptPath)) {
-        return false;
+        return {
+          success: false,
+          error: "SCRIPT_VALIDATION_FAILED",
+          message: `JavaScript validation failed for: ${scriptPath}`,
+          path: scriptPath,
+        };
       }
 
+      /*
+       * Import JavaScript module.
+       */
       const module = await import(chrome.runtime.getURL(scriptPath));
 
-      // Make sure tool() exists.
+      /*
+       * Make sure tool() exists.
+       */
       if (typeof module.tool !== "function") {
-        return false;
+        return {
+          success: false,
+          error: "TOOL_FUNCTION_MISSING",
+          message: `The JavaScript module does not export a tool() function: ${scriptPath}`,
+          path: scriptPath,
+        };
       }
     } catch (error) {
       console.error(`Failed to load tool script: ${scriptPath}`, error);
 
-      return false;
+      return {
+        success: false,
+        error: "SCRIPT_LOAD_FAILED",
+        message: `Failed to load JavaScript file: ${scriptPath}`,
+        path: scriptPath,
+        details: error.message,
+      };
     }
   }
 
   /*
+   * ============================================================
    * Validate entry HTML
+   * ============================================================
    */
+
   if (metadata.entry) {
+    /*
+     * Entry must be a string.
+     */
     if (typeof metadata.entry !== "string") {
-      return false;
+      return {
+        success: false,
+        error: "INVALID_ENTRY",
+        message: "metadata.entry must be a string.",
+        path,
+      };
     }
 
     const htmlPath = `${base}/${metadata.entry}.html`;
+
     const data = await test(htmlPath);
 
+    /*
+     * Entry HTML does not exist.
+     */
     if (!data[0]) {
-      return false;
+      return {
+        success: false,
+        error: "ENTRY_HTML_NOT_FOUND",
+        message: `Entry HTML file was not found: ${htmlPath}`,
+        path: htmlPath,
+      };
     }
 
-    // Tool HTML must not contain executable script tags.
+    /*
+     * Tool HTML must not contain executable script tags.
+     */
     if (hasScript(data[1])) {
-      return false;
+      return {
+        success: false,
+        error: "SCRIPT_TAG_IN_HTML",
+        message: `Executable <script> tag detected in tool HTML: ${htmlPath}`,
+        path: htmlPath,
+      };
     }
   }
 
   /*
+   * ============================================================
    * Validate CSS action
+   * ============================================================
    */
+
   if (actions.css) {
+    /*
+     * CSS value must be a string.
+     */
     if (typeof actions.css !== "string") {
-      return false;
+      return {
+        success: false,
+        error: "INVALID_CSS_PROPERTY",
+        message: "actions.css must be a string.",
+        path,
+      };
     }
 
     const cssPath = `${base}/${actions.css}.css`;
+
     const cssExists = await test(cssPath);
 
+    /*
+     * CSS file does not exist.
+     */
     if (!cssExists[0]) {
-      return false;
+      return {
+        success: false,
+        error: "CSS_NOT_FOUND",
+        message: `CSS file was not found: ${cssPath}`,
+        path: cssPath,
+      };
     }
   }
 
-  return true;
+  /*
+   * ============================================================
+   * Everything passed
+   * ============================================================
+   */
+
+  return {
+    success: true,
+    error: null,
+    message: "All tool validation checks passed.",
+    path,
+  };
 }
