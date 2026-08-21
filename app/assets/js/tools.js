@@ -100,7 +100,7 @@ async function setupToolsMenu(toolName = null, allToolsData = null) {
   console.log(toolsData);
   if (toolsData.length === 0) {
     const errorContainer = document.getElementById("error-container");
-    errorContainer.style.display = "block";
+    errorContainer.style.display = "flex";
     const result = await Promise.all(
       defaultTools().map((tool) => storeMetadataInStorageT(tool)),
     );

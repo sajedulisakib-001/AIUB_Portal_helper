@@ -771,7 +771,9 @@ body {
     bottom: 16px;
     transform: translateX(-50%);
 
-    display: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .error-container {
     display: flex;
