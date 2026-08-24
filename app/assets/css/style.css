@@ -496,6 +496,16 @@ body {
     border-color: #333 transparent transparent transparent;
 }
 
+.card-body > div:nth-of-type(4) .info-icon .tooltip-text {
+    left: 0;
+    transform: none;
+}
+
+.card-body > div:nth-of-type(4) .info-icon .tooltip-text::after {
+    left: 10px;
+    transform: none;
+}
+
 /* Other Tooltip Style */
 .show-tooltip {
     position: relative;
