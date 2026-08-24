@@ -15,23 +15,23 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("init-data-load").classList.add("show");
     return;
   }
-  const { ["tools-metadata"]: toolsData = [] } =
-    await chrome.storage.local.get("tools-metadata");
-  let isToolsPageLoaded = false;
-  if (toolsData.length !== 0) {
-    const windowHost = await getCurrentTabUrl();
+  const windowHost = await getCurrentTabUrl();
+  if (windowHost.host !== "portal.aiub.edu") {
+    const { ["tools-metadata"]: toolsData = [] } =
+      await chrome.storage.local.get("tools-metadata");
+    let isToolsPageLoaded = false;
+    if (toolsData.length !== 0) {
+      if (windowHost) {
+        const tool = toolsData.find(
+          (tool) => new URL(tool.host).host === windowHost.host,
+        )?.path;
 
-    if (windowHost) {
-      console.log(windowHost.host);
-      const tool = toolsData.find(
-        (tool) => new URL(tool.host).host === windowHost.host,
-      )?.path;
+        console.log(tool);
 
-      console.log(tool);
-
-      if (tool) {
-        loadHTML("show-page-content", "tools", tool, toolsData);
-        isToolsPageLoaded = true;
+        if (tool) {
+          loadHTML("show-page-content", "tools", tool, toolsData);
+          isToolsPageLoaded = true;
+        }
       }
     }
   }
