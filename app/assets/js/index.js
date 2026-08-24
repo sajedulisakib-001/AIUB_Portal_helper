@@ -15,11 +15,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("init-data-load").classList.add("show");
     return;
   }
+  let isToolsPageLoaded = false;
   const windowHost = await getCurrentTabUrl();
   if (windowHost.host !== "portal.aiub.edu") {
     const { ["tools-metadata"]: toolsData = [] } =
       await chrome.storage.local.get("tools-metadata");
-    let isToolsPageLoaded = false;
+    
     if (toolsData.length !== 0) {
       if (windowHost) {
         const tool = toolsData.find(
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await setupNavigation();
   if (!isToolsPageLoaded) {
-    
+
     loadHTML("show-page-content", "home");
     updateHoliday();
     showIndicator();
