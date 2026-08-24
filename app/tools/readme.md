@@ -4,6 +4,16 @@ This folder holds every "tool" (mini-app) that shows up in the extension's **Too
 
 Use the existing `app/tools/t1/` folder as the simplest working example, and `app/tools/geogebra/` as a more complete real-world example.
 
+> 💡 **Developing locally?** Tool scripts are hash-checked against a remote integrity server before they're allowed to run (see [section 6](#6-script-integrity-checking)). If you don't want to wait on that server while you're still iterating, you can temporarily stub out `validateScript` in `app/assets/js/lib/tools_integrity_checker.js`:
+>
+> ```javascript
+> async function validateScript(filePath) {
+>     return true;
+> }
+> ```
+>
+> This skips the hash lookup entirely and lets any script run. It's meant for local development only — make sure to revert this change (and go through the real integrity-server registration) before shipping or sharing the extension, otherwise unverified scripts will be able to run unchecked.
+
 ---
 
 ## 1. Folder structure
@@ -55,7 +65,7 @@ Every tool needs a `metadata.json` describing itself:
 | `version` | No | Your own version number for the tool. |
 | `author` | No | Your name / handle. |
 | `license` | No | License for the tool's own code. |
-| `host` | No | The site this tool is meant to be used on (informational only). |
+| `host` | Required if the tool is meant for a specific website (optional otherwise) | The site this tool is meant to be used on, e.g. `"https://www.geogebra.org/classic"`. Leave it out only if the tool is generic and not tied to any particular site. |
 | `entry` | Required if the tool has UI | Name (without `.html`) of the HTML file to load, e.g. `"index"` → `index.html`. |
 | `repository` | No | Where the tool's source lives. |
 | `actions.script` | Required if `actions.run` is `true` | Name (without `.js`) of the JS file to load, e.g. `"script"` → `script.js`. |
