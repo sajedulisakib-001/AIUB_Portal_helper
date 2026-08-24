@@ -223,17 +223,6 @@ h2 {
   padding: 16px 12px;
 }
 
-/* Status line */
-
-.t-status {
-  margin-top: 6px;
-  min-height: 14px;
-  font-size: 11px;
-  color: #6c757d;
-  text-align: center;
-}
-
-
 /* =========================================================
    COLOR PICKER
    ONLY .c-* RULES BELOW WERE CHANGED
@@ -842,10 +831,11 @@ h2 {
    TOAST
    --------------------------------------------------------- */
 
-.c-toast {
+.toast {
   position: fixed;
+  max-width: max-content;
 
-  bottom: 12px;
+  bottom: -15px;
 
   left: 50%;
 
@@ -874,7 +864,7 @@ h2 {
   z-index: 9999;
 }
 
-.c-toast.show {
+.toast.show {
   opacity: 1;
 
   transform:

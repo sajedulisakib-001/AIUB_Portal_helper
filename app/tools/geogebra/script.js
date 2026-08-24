@@ -3,7 +3,7 @@ export function tool(path) {
   const output = document.getElementById("t-output");
   const getData = document.getElementById("t-getData");
   const deletePoints = document.getElementById("t-deletePoints");
-  const status = document.getElementById("t-status");
+  const toast = document.getElementById("toast");
   const copyBtn = document.getElementById("t-copyBtn");
   const howToUseBtn = document.getElementById("t-howToUseBtn");
 
@@ -30,7 +30,6 @@ export function tool(path) {
     tabExtractBtn.classList.toggle("active", showingExtract);
     tabColorBtn.classList.toggle("active", !showingExtract);
 
-    status.textContent = "";
 
     // Lazily wire up the color picker the first time its tab is opened.
     // Re-running this on every tab switch would keep attaching new
@@ -56,7 +55,7 @@ export function tool(path) {
   }
 
   getData.addEventListener("click", async () => {
-    status.textContent = "Reading GeoGebra...";
+    showToast("Reading GeoGebra...");
 
     try {
       await saveSettings();
@@ -109,14 +108,14 @@ export function tool(path) {
       });
 
       output.value = blocks.join("\n\n");
-      status.textContent = `${data.groups.length} shape(s), ${data.totalCount} point(s) found.`;
+      showToast(`${data.groups.length} shape(s), ${data.totalCount} point(s) found.`);
     } catch (error) {
       status.textContent = error.message;
     }
   });
 
   deletePoints.addEventListener("click", async () => {
-    status.textContent = "Deleting points...";
+    showToast("Deleting points...");
     try {
       const [tab] = await chrome.tabs.query({
         active: true,
@@ -141,15 +140,15 @@ export function tool(path) {
         throw new Error(data.error);
       }
       output.value = "";
-      status.textContent = `${data.deletedCount ?? 0} point(s) deleted.`;
+      showToast(`${data.deletedCount ?? 0} point(s) deleted.`);
     } catch (error) {
-      status.textContent = error.message;
+      showToast(error.message);
     }
   });
 
   copyBtn.addEventListener("click", async () => {
     if (!output.value) {
-      status.textContent = "Nothing to copy yet.";
+      showToast("Nothing to copy yet.");
       return;
     }
 
@@ -157,7 +156,7 @@ export function tool(path) {
 
     const showCopied = () => {
       copyBtn.textContent = "Copied!";
-      status.textContent = "Copied to clipboard.";
+      showToast("Copied to clipboard.");
       setTimeout(() => {
         copyBtn.textContent = originalLabel;
       }, 1200);
@@ -477,7 +476,6 @@ export function tool(path) {
       hueCursor: document.getElementById("c-hueCursor"),
       alphaTrack: document.getElementById("c-alphaTrack"),
       alphaCursor: document.getElementById("c-alphaCursor"),
-      toast: document.getElementById("c-toast"),
       eyedropBtn: document.getElementById("c-eyedropBtn"),
     };
 
@@ -712,12 +710,7 @@ export function tool(path) {
       });
     });
 
-    function showToast(msg) {
-      els.toast.textContent = msg;
-      els.toast.classList.add("show");
-      clearTimeout(showToast._t);
-      showToast._t = setTimeout(() => els.toast.classList.remove("show"), 1200);
-    }
+    
 
     // ---- SV area drag ----
     function setSVFromEvent(clientX, clientY) {
@@ -830,6 +823,13 @@ export function tool(path) {
 
     render();
   }
+
+  function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(showToast._t);
+      showToast._t = setTimeout(() => toast.classList.remove("show"), 1200);
+    }
 
   loadSettings();
 }
