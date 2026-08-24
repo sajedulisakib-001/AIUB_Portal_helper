@@ -12,6 +12,7 @@ Aiub Portal Helper is a Chrome extension for AIUB students that helps automate c
 - **Unlocked courses**: Uses completed course data and prerequisite information to suggest which courses are currently unlocked.
 - **Notices**: Fetches and displays AIUB notices from a remote endpoint and keeps track of which ones have been viewed.
 - **Settings**: Lets users enable auto-login, save credentials, configure the Gemini API key, and choose when tomorrow’s routine should appear.
+- **Tools**: A pluggable mini-app system (`app/tools/`). Each tool is a self-contained folder (HTML + CSS + JS + metadata) that gets mounted into the popup and can run its own logic against the active tab. See [`app/tools/readme.md`](app/tools/readme.md) for how to build one.
 
 ---
 
@@ -55,6 +56,10 @@ Aiub Portal Helper is a Chrome extension for AIUB students that helps automate c
 5. **Settings**:
    - Open **Settings** to enable auto-login, save your AIUB login details, add your Gemini API key, and choose the time for tomorrow’s routine preview.
 
+6. **Tools**:
+   - Open **Tools** to browse installed mini-apps (e.g. the GeoGebra helper).
+   - Selecting a tool mounts its HTML/CSS/JS into the popup; use the back button to return to the tools menu.
+
 ---
 
 ## Configuration
@@ -81,14 +86,16 @@ AIUB_Portal_Helper/
 │   │   ├── css/               # Extension popup styles
 │   │   ├── icons/             # Extension icons
 │   │   ├── js/                # Popup logic, portal parsers, and injected scripts
-│   │   │   ├── lib/           # Shared helper utilities
+│   │   │   ├── lib/           # Shared helper utilities (tool loading, storage guard, integrity checker)
 │   │   │   └── toInject/      # Content scripts injected into portal pages
-│   │   └── json/              # Course and holiday data used by the UI
-│   └── pages/                 # Popup page HTML templates (home, notice, other, settings)
-├── background.js              # Service worker that injects scripts when the portal loads
-├── index.html                 # Popup UI entry point
-├── manifest.json              # Manifest V3 extension configuration
-└── readme.md                  # Project documentation
+│   │   └── json/               # Course and holiday data used by the UI
+│   ├── pages/                  # Popup page HTML templates (home, notice, other, settings, tools)
+│   └── tools/                  # Pluggable tools (mini-apps) shown in the Tools menu
+│       └── readme.md          # Guide for creating your own tool
+├── background.js               # Service worker that injects scripts when the portal loads
+├── index.html                  # Popup UI entry point
+├── manifest.json               # Manifest V3 extension configuration
+└── readme.md                   # Project documentation
 ```
 
 ---
@@ -124,6 +131,9 @@ The extension uses the following permissions:
    - Verify that the project folder is loaded as an unpacked extension in Chrome.
    - Make sure the extension is not being blocked by a browser policy or corrupted installation.
 
+5. **A tool fails to load / shows a validation error**:
+   - Tool scripts are checked against a remote integrity server before they are allowed to run (see [`app/tools/readme.md`](app/tools/readme.md)). If you just added or edited a tool, its script hash must be registered on that server first.
+
 ---
 
 ## License
@@ -134,7 +144,7 @@ This repository does not currently include a `LICENSE` file. If you plan to redi
 
 ## Contributing
 
-Contributions are welcome. If you find a bug or want to improve the extension, feel free to open an issue or submit a pull request.
+Contributions are welcome. If you find a bug or want to improve the extension, feel free to open an issue or submit a pull request. If you'd like to add a new tool to the **Tools** menu, see [`app/tools/readme.md`](app/tools/readme.md) for the full guide.
 
 
 ---
