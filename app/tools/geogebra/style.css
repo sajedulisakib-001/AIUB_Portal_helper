@@ -1,0 +1,934 @@
+/* GeoGebra Point Extractor -- styled to match the extension's own UI
+ * (Segoe UI, #0d6efd blue, white rounded cards, soft shadows -- see
+ * app/assets/css/style.css: .routine-item, #unlocked, #courseListContainer).
+ *
+ * Sized to fit entirely inside #tools-container with no scrolling: every
+ * element below has an explicit, budgeted height instead of relying on the
+ * popup's available space, so nothing overflows the 500x600 popup.
+ */
+
+:root {
+  --ink: #16181c;
+  --sub: #6b7178;
+  --line: #e2e4e8;
+  --line-strong: #c7cad0;
+  --bg: #ffffff;
+  --panel: #fafafb;
+  --accent: #8fb8ff;
+  --accent-ink: #1c3f7a;
+  --radius: 10px;
+  --mono: "SFMono-Regular", ui-monospace, Menlo, Consolas, monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d6efd;
+  letter-spacing: -0.2px;
+  padding-left: 30px;
+}
+
+.t-container {
+  padding: 12px 14px;
+  font-family: inherit;
+}
+
+/* Header */
+
+.t-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+  /* Clears the popup's fixed notification icon (top-right corner, ~40px
+     wide) so the help button never sits underneath it. */
+  padding-right: 34px;
+}
+
+.t-header .t-help-btn {
+  width: auto;
+  flex-shrink: 0;
+  margin-top: 0;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  background: #eaf2ff;
+  color: #0d6efd;
+  border: 1px solid #cfe0ff;
+}
+
+.t-help-btn:hover {
+  background: #dcebff;
+}
+
+/* Segmented tab control */
+
+.t-tabs {
+  display: flex;
+  border-radius: 8px;
+  padding: 3px;
+  gap: 30px;
+}
+
+.t-tab {
+  flex: 1;
+  width: auto;
+  margin: 0;
+  padding: 7px 6px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.t-tab:hover {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.t-tab.active {
+  background: #0d6efd;
+  color: #ffffff;
+  box-shadow: 0 1px 3px rgba(13, 110, 253, 0.18);
+}
+
+.t-tab.active:hover {
+  background: #0e6bf7;
+  color: #ffffff;
+}
+
+/* Pages */
+
+.t-page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.t-page.hidden {
+  display: none;
+}
+
+/* Cards -- match the app's routine-item / course-list card language */
+
+.t-card {
+  background: #ffffff;
+  border: 1px solid #e3e8f0;
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 3px rgba(16, 24, 40, 0.05);
+}
+
+.t-card label {
+  display: block;
+  margin: 0 0 5px;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.t-container select,
+.t-container input,
+.t-container textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d0d5dd;
+  border-radius: 7px;
+  padding: 7px 9px;
+  font-size: 12.5px;
+  font-family: inherit;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.t-container select:focus,
+.t-container input:focus,
+.t-container textarea:focus {
+  outline: none;
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+}
+
+.t-container input[readonly],
+.t-container textarea[readonly] {
+  background: #f9fafb;
+  color: #374151;
+}
+
+/* Output card: fixed-height textarea sized to fit the popup with no
+ * page-level scrolling. Long output scrolls inside the textarea itself
+ * (normal textarea behavior), not the tools page.
+ */
+
+.t-outputCard textarea {
+  height: 220px;
+  resize: none;
+  font-family: "SFMono-Regular", Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.t-btnRow {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.t-btnRow button {
+  width: auto;
+  flex: 1;
+}
+
+.t-container button {
+  width: 100%;
+  margin-top: 0;
+  padding: 8px;
+  border: 0;
+  border-radius: 7px;
+  background: #fefefe;
+  color: #0d6efd;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid #adadad;
+}
+
+.t-container button:hover {
+  background: #dcdcdc;
+}
+
+.t-container button:active {
+  transform: translateY(1px);
+}
+
+.t-container button.t-secondary {
+  background: #eef1f6;
+  color: #374151;
+}
+
+.t-container button.t-secondary:hover {
+  background: #e2e6ed;
+}
+
+.t-card.t-center {
+  text-align: center;
+  padding: 16px 12px;
+}
+
+/* Status line */
+
+.t-status {
+  margin-top: 6px;
+  min-height: 14px;
+  font-size: 11px;
+  color: #6c757d;
+  text-align: center;
+}
+
+
+/* =========================================================
+   COLOR PICKER
+   ONLY .c-* RULES BELOW WERE CHANGED
+   Chromium only
+   Designed for 448x490
+   ========================================================= */
+
+.c-card {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  padding: 10px;
+
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+
+  box-shadow:
+    0 1px 2px rgba(20, 20, 30, 0.04),
+    0 8px 24px -14px rgba(20, 20, 30, 0.12);
+
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+
+/* ---------------------------------------------------------
+   TOP ROW
+   --------------------------------------------------------- */
+
+.c-top-row {
+  display: flex;
+  flex: 0 0 auto;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 9px;
+
+  align-items: center;
+
+  margin-bottom: 8px;
+}
+
+
+/* ---------------------------------------------------------
+   COLOR SWATCH
+   --------------------------------------------------------- */
+
+.c-swatch {
+  position: relative;
+
+  width: 52px;
+  height: 52px;
+
+  flex: 0 0 52px;
+
+  border-radius: 8px;
+
+  border: 1px solid var(--line-strong);
+
+  background-image:
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+
+  background-size: 12px 12px;
+
+  background-position:
+    0 0,
+    0 6px,
+    6px -6px,
+    -6px 0;
+
+  overflow: hidden;
+}
+
+.c-swatch::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background: var(--swatch-color);
+}
+
+
+/* ---------------------------------------------------------
+   COLOR TEXT FIELDS
+   --------------------------------------------------------- */
+
+.c-fields {
+  flex: 1 1 auto;
+
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+.c-field-row {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+}
+
+.c-field-row input {
+  width: 100%;
+  min-width: 0;
+
+  border: 1px solid var(--line-strong);
+
+  border-radius: 7px;
+
+  padding: 6px 28px 6px 9px;
+
+  font-family: var(--mono);
+  font-size: 11px;
+
+  line-height: 1.2;
+
+  color: var(--ink);
+
+  background: var(--panel);
+
+  outline: none;
+
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.c-field-row input:focus {
+  border-color: #8fa8ff;
+  background: #fff;
+}
+
+
+/* ---------------------------------------------------------
+   COPY BUTTON
+   --------------------------------------------------------- */
+
+.c-copy-btn {
+  position: absolute;
+
+  right: 6px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: auto !important;
+
+  margin: 0 !important;
+  padding: 2px !important;
+
+  color: var(--sub);
+
+  background: transparent !important;
+
+  border: none !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  border-radius: 4px;
+
+  box-shadow: none !important;
+}
+
+.c-copy-btn:hover {
+  color: var(--ink);
+
+  background: #eceef1 !important;
+}
+
+.c-copy-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+
+/* ---------------------------------------------------------
+   EYEDROPPER
+   --------------------------------------------------------- */
+
+.c-eyedrop-btn {
+  position: static;
+
+  width: auto !important;
+
+  flex: 0 0 auto;
+
+  margin-left: 2px !important;
+
+  padding: 2px !important;
+
+  transform: none;
+
+  color: var(--sub);
+
+  background: transparent !important;
+
+  border: none !important;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  border-radius: 4px;
+
+  box-shadow: none !important;
+}
+
+.c-eyedrop-btn:hover {
+  color: var(--ink);
+
+  background: #eceef1 !important;
+}
+
+.c-eyedrop-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+
+/* ---------------------------------------------------------
+   RGB / RGBA CHANNELS
+   --------------------------------------------------------- */
+
+.c-channels {
+  flex: 0 0 auto;
+
+  width: 100%;
+  min-width: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    19px
+    54px
+    minmax(0, 1fr);
+
+  row-gap: 5px;
+
+  column-gap: 6px;
+
+  align-items: center;
+
+  margin-bottom: 8px;
+}
+
+.c-channels label {
+  font-size: 10px;
+
+  font-weight: 700;
+
+  color: var(--sub);
+
+  text-align: center;
+}
+
+.c-channels input[type="number"] {
+  width: 100%;
+  min-width: 0;
+
+  border: 1px solid var(--line-strong);
+
+  border-radius: 6px;
+
+  padding: 4px 6px;
+
+  font-family: var(--mono);
+
+  font-size: 11px;
+
+  line-height: 1.2;
+
+  outline: none;
+
+  background: var(--panel);
+}
+
+.c-channels input[type="number"]:focus {
+  border-color: #8fa8ff;
+  background: #fff;
+}
+
+
+/* ---------------------------------------------------------
+   RGB SLIDER
+   --------------------------------------------------------- */
+
+.c-slider-track {
+  position: relative;
+
+  width: 100%;
+  min-width: 0;
+
+  height: 18px;
+
+  border-radius: 9px;
+
+  border: 1px solid var(--line-strong);
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+}
+
+.c-slider-track.c-checker {
+  background-image:
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+
+  background-size: 10px 10px;
+
+  background-position:
+    0 0,
+    0 5px,
+    5px -5px,
+    -5px 0;
+}
+
+.c-slider-track .c-grad {
+  position: absolute;
+
+  inset: 0;
+
+  border-radius: 8px;
+
+  pointer-events: none;
+}
+
+.c-slider-track input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+
+  width: 100%;
+  height: 100%;
+
+  background: transparent;
+
+  margin: 0;
+
+  padding: 0;
+
+  position: relative;
+
+  z-index: 2;
+
+  cursor: pointer;
+}
+
+
+/* Chromium slider thumb */
+
+.c-slider-track input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+
+  width: 14px;
+  height: 22px;
+
+  border-radius: 4px;
+
+  background: #fff;
+
+  border: 1px solid var(--line-strong);
+
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.25);
+
+  cursor: pointer;
+}
+
+
+/* ---------------------------------------------------------
+   SATURATION / VALUE
+   --------------------------------------------------------- */
+
+.c-sv-area {
+  position: relative;
+
+  flex: 1 1 auto;
+
+  width: 100%;
+
+  min-width: 0;
+  min-height: 110px;
+
+  height: auto;
+
+  margin-bottom: 7px;
+
+  border-radius: 8px;
+
+  border: 1px solid var(--line-strong);
+
+  background: #f00;
+
+  cursor: crosshair;
+
+  touch-action: none;
+
+  overflow: hidden;
+}
+
+.c-sv-white {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      to right,
+      #fff,
+      rgba(255, 255, 255, 0)
+    );
+
+  pointer-events: none;
+}
+
+.c-sv-black {
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    linear-gradient(
+      to top,
+      #000,
+      rgba(0, 0, 0, 0)
+    );
+
+  pointer-events: none;
+}
+
+.c-sv-cursor {
+  position: absolute;
+
+  width: 16px;
+  height: 16px;
+
+  border-radius: 50%;
+
+  border: 2px solid #fff;
+
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.4),
+    0 1px 4px rgba(0, 0, 0, 0.5);
+
+  transform:
+    translate(-50%, -50%);
+
+  pointer-events: none;
+}
+
+
+/* ---------------------------------------------------------
+   HUE
+   --------------------------------------------------------- */
+
+.c-hue-track {
+  position: relative;
+
+  flex: 0 0 18px;
+
+  width: 100%;
+
+  height: 18px;
+
+  margin-bottom: 6px;
+
+  border-radius: 9px;
+
+  border: 1px solid var(--line-strong);
+
+  background:
+    linear-gradient(
+      to right,
+      #ff0000,
+      #ffff00,
+      #00ff00,
+      #00ffff,
+      #0000ff,
+      #ff00ff,
+      #ff0000
+    );
+
+  touch-action: none;
+}
+
+.c-hue-cursor {
+  position: absolute;
+
+  top: 50%;
+
+  width: 12px;
+  height: 22px;
+
+  border-radius: 4px;
+
+  background: #fff;
+
+  border: 1px solid var(--line-strong);
+
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3);
+
+  transform:
+    translate(-50%, -50%);
+
+  pointer-events: none;
+}
+
+
+/* ---------------------------------------------------------
+   ALPHA
+   --------------------------------------------------------- */
+
+.c-alpha-track {
+  position: relative;
+
+  flex: 0 0 18px;
+
+  width: 100%;
+
+  height: 18px;
+
+  border-radius: 9px;
+
+  border: 1px solid var(--line-strong);
+
+  background-image:
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+
+  background-size: 10px 10px;
+
+  background-position:
+    0 0,
+    0 5px,
+    5px -5px,
+    -5px 0;
+
+  touch-action: none;
+}
+
+.c-alpha-grad {
+  position: absolute;
+
+  inset: 0;
+
+  border-radius: 8px;
+
+  pointer-events: none;
+}
+
+.c-alpha-cursor {
+  position: absolute;
+
+  top: 50%;
+
+  width: 12px;
+  height: 22px;
+
+  border-radius: 4px;
+
+  background: #fff;
+
+  border: 1px solid var(--line-strong);
+
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.3);
+
+  transform:
+    translate(-50%, -50%);
+
+  pointer-events: none;
+}
+
+
+/* ---------------------------------------------------------
+   TOAST
+   --------------------------------------------------------- */
+
+.c-toast {
+  position: fixed;
+
+  bottom: 12px;
+
+  left: 50%;
+
+  transform:
+    translateX(-50%)
+    translateY(10px);
+
+  background: var(--ink);
+
+  color: #fff;
+
+  font-size: 11px;
+
+  padding: 6px 10px;
+
+  border-radius: 7px;
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+
+  z-index: 9999;
+}
+
+.c-toast.show {
+  opacity: 1;
+
+  transform:
+    translateX(-50%)
+    translateY(0);
+}
+
+
+/* ---------------------------------------------------------
+   COLOR PICKER HEIGHT SAFETY
+   --------------------------------------------------------- */
+
+@media (max-height: 490px) {
+
+  .c-card {
+    padding: 8px 10px;
+  }
+
+  .c-top-row {
+    margin-bottom: 7px;
+  }
+
+  .c-swatch {
+    width: 48px;
+    height: 48px;
+
+    flex-basis: 48px;
+  }
+
+  .c-fields {
+    gap: 4px;
+  }
+
+  .c-field-row input {
+    padding: 6px 28px 6px 9px;
+    font-size: 11px;
+  }
+
+  .c-channels {
+    row-gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  .c-channels input[type="number"] {
+    padding: 4px 5px;
+    font-size: 10px;
+  }
+
+  .c-sv-area {
+    min-height: 60px;
+    margin-bottom: 6px;
+  }
+
+  .c-hue-track {
+    margin-bottom: 5px;
+  }
+}

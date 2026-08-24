@@ -1,0 +1,51 @@
+{
+    "manifest_version": 3,
+    "name": "Aiub Portal Helper - Beta",
+    "version": "3.0.0", 
+    "description": "This is a simple Chrome extension for AIUB Students.",
+    "action": {
+        "default_popup": "index.html",
+        "default_icon": {   
+            "16": "app/assets/icons/icon-16.png",
+            "32": "app/assets/icons/icon-32.png",
+            "48": "app/assets/icons/icon-48.png",
+            "128": "app/assets/icons/icon-128.png"
+        },
+        "default_title": "Aiub Portal Helper"
+    },
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "permissions": [
+        "scripting",
+        "tabs",
+        "storage",
+        "activeTab",
+        "clipboardWrite"
+    ],
+    "host_permissions": [
+        "*://portal.aiub.edu/*"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "app/assets/js/toInject/*",
+                "app/pages/*",
+                "app/assets/json/*"
+            ],
+            "matches": [
+                "*://portal.aiub.edu/*"
+            ]
+        }
+    ],
+    "commands": {
+    "pick_color": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+U",
+        "mac": "Command+Shift+U"
+      },
+      "description": "Pick a color from anywhere on screen"
+    }
+  }
+}

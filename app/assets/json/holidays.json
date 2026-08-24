@@ -1,0 +1,170 @@
+[
+    {
+        "date": "11 Feb",
+        "day_of_week": "Wednesday",
+        "name": "Election Day",
+        "type": "National Holiday"
+    },
+    {
+        "date": "12 Feb",
+        "day_of_week": "Thursday",
+        "name": "Election Day Holiday",
+        "type": "National Holiday"
+    },
+    {
+        "date": "14 Feb",
+        "day_of_week": "Saturday",
+        "name": "Valentine's Day",
+        "type": "Observance"
+    },
+    {
+        "date": "15 Feb",
+        "day_of_week": "Sunday",
+        "name": "Maha Shivaratri",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "18 Feb",
+        "day_of_week": "Wednesday",
+        "name": "Ramadan Start (Tentative Date)",
+        "type": "Observance"
+    },
+    {
+        "date": "18 Feb",
+        "day_of_week": "Wednesday",
+        "name": "Ash Wednesday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "21 Feb",
+        "day_of_week": "Saturday",
+        "name": "Language Martyrs' Day",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "2 Mar",
+        "day_of_week": "Monday",
+        "name": "National Flag Day",
+        "type": "Observance"
+    },
+    {
+        "date": "3 Mar",
+        "day_of_week": "Tuesday",
+        "name": "Holi",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "17 Mar",
+        "day_of_week": "Tuesday",
+        "name": "Shab-e-qadr",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "17 Mar",
+        "day_of_week": "Tuesday",
+        "name": "Arrival Day of Sri Sri Harichand Tagore",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "19 Mar",
+        "day_of_week": "Thursday",
+        "name": "Eid ul-Fitr Holiday (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "20 Mar",
+        "day_of_week": "Friday",
+        "name": "Jumatul Bidah",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "20 Mar",
+        "day_of_week": "Friday",
+        "name": "Eid ul-Fitr Holiday (Tentative Date)",
+        "type": "National Holiday"
+    },
+    {
+        "date": "20 Mar",
+        "day_of_week": "Friday",
+        "name": "March Equinox",
+        "type": "Season"
+    },
+    {
+        "date": "21 Mar",
+        "day_of_week": "Saturday",
+        "name": "Eid ul-Fitr (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "22 Mar",
+        "day_of_week": "Sunday",
+        "name": "Eid ul-Fitr Holiday (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "23 Mar",
+        "day_of_week": "Monday",
+        "name": "Eid ul-Fitr Holiday (Tentative Date)",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "24 Mar",
+        "day_of_week": "Tuesday",
+        "name": "Eid ul-Fitr Holiday (Tentative Date)",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "26 Mar",
+        "day_of_week": "Thursday",
+        "name": "Independence Day",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "2 Apr",
+        "day_of_week": "Thursday",
+        "name": "Maundy Thursday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "3 Apr",
+        "day_of_week": "Friday",
+        "name": "Good Friday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "4 Apr",
+        "day_of_week": "Saturday",
+        "name": "Holy Saturday",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "5 Apr",
+        "day_of_week": "Sunday",
+        "name": "Easter Day",
+        "type": "Optional Holiday"
+    },
+    {
+        "date": "6 Apr",
+        "day_of_week": "Monday",
+        "name": "Easter Monday",
+        "type": "Observance"
+    },
+    {
+        "date": "13 Apr",
+        "day_of_week": "Monday",
+        "name": "Chaitra Sankranti",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "14 Apr",
+        "day_of_week": "Tuesday",
+        "name": "Bengali New Year",
+        "type": "Government Holiday"
+    },
+    {
+        "date": "30 Apr",
+        "day_of_week": "Thursday",
+        "name": "Buddha Purnima Holiday",
+        "type": "Optional Holiday"
+    }
+]

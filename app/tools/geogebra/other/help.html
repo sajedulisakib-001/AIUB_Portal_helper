@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>How to Use — GeoGebra Point Extractor</title>
+  <link rel="stylesheet" href="help.css">
+</head>
+<body>
+
+  <header class="topbar">
+    <h1>GeoGebra Point Extractor</h1>
+    <span class="subtitle">How to Use</span>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar">
+      <a href="#getting-started" class="nav-link">1. Getting started</a>
+      <a href="#skipped-points" class="nav-link">2. Skipped points</a>
+      <a href="#get-data" class="nav-link">3. Get Data</a>
+      <a href="#point-naming" class="nav-link">4. Point naming</a>
+      <a href="#copy" class="nav-link">5. Copy the output</a>
+      <a href="#color-picker" class="nav-link">6. Color picker</a>
+      <a href="#reading-output" class="nav-link">7. Reading the output</a>
+      <a href="#troubleshooting" class="nav-link">8. Troubleshooting</a>
+    </nav>
+
+    <main class="content">
+
+      <section id="getting-started">
+        <h2>1. Getting started</h2>
+        <p>This extension reads the points currently on a GeoGebra applet
+        and converts their coordinates into ready-to-use code. Before you
+        start, make sure you actually have a GeoGebra page open in the
+        active browser tab — the one with your graph, points, and shapes
+        on it.</p>
+        <ol>
+          <li>Open the GeoGebra page in your browser.</li>
+          <li>Click the extension's icon in the toolbar to open the popup.</li>
+        </ol>
+        <p class="note">The extension only works on pages where GeoGebra's
+        applet is actually loaded. It won't do anything on a blank tab,
+        Chrome's settings pages, or a page where GeoGebra hasn't finished
+        loading yet.</p>
+      </section>
+
+      <section id="skipped-points">
+        <h2>2. Skipped points</h2>
+        <p>The "Skipped points" box lets you list any point names you
+        don't want included in the output, separated by commas. For
+        example:</p>
+        <pre>X,Y,X1,Y1</pre>
+        <p>That's the default, and it's there because many GeoGebra
+        constructions use points named <code>X</code>, <code>Y</code>,
+        <code>X1</code>, <code>Y1</code> as helper/reference points that
+        you usually don't want in your final output. Add or remove names
+        here as needed — you can leave it as the default if you're not
+        sure.</p>
+        <p class="note">Points that are hidden or disabled in GeoGebra
+        (deselected in the algebra view) are always left out automatically
+        — you don't need to list them here as well.</p>
+      </section>
+
+      <section id="get-data">
+        <h2>3. Get Data</h2>
+        <p>Click the <strong>Get Data</strong> button. The extension scans
+        every point currently defined in your GeoGebra file, in the order
+        they appear in the algebra view, and turns each one into a line of
+        coordinate code. Points are automatically grouped by the shape
+        they belong to (using any text labels in your construction) and
+        sorted in a sensible order.</p>
+        <p>The result appears in the big <strong>Output</strong> box, and
+        the status line underneath tells you how many shapes and points
+        were found.</p>
+      </section>
+
+      <section id="point-naming">
+        <h2>4. Point naming</h2>
+        <p>The extractor recognizes:</p>
+        <ul>
+          <li>Plain letters: <code>A</code>, <code>B</code>,
+          <code>AB</code></li>
+          <li>Single-digit subscripts: <code>A1</code>, <code>A_1</code>,
+          up through <code>Z9</code></li>
+        </ul>
+        <p>All of these count as valid points and get pulled into the
+        output, sorted first by subscript number and then alphabetically
+        within each group (so you'll see <code>A, B, ... Z, A1, B1, ...
+        Z9</code>).</p>
+        <p class="note"><strong>Known limit:</strong> points with a
+        two-digit-or-higher subscript (<code>A10</code> and beyond) are
+        not currently guaranteed to be picked up. If your construction
+        needs more than 10 points per letter (A, A1, A2 ... A9), name
+        the extras differently — for example, a new letter — rather than
+        relying on subscripts past 9.</p>
+        <p class="note">A point is otherwise only <em>excluded</em> for
+        one of two reasons: it's hidden/deselected in GeoGebra's algebra
+        view, or its name is in the "Skipped points" box.</p>
+      </section>
+
+      <section id="copy">
+        <h2>5. Copy the output</h2>
+        <p>Once you have output, click <strong>Copy</strong> to copy the
+        entire contents of the Output box to your clipboard. You'll see
+        the button briefly change to "Copied!" to confirm it worked. From
+        there you can paste it directly into whatever tool or code editor
+        you're using.</p>
+      </section>
+
+      <section id="color-picker">
+        <h2>6. Color picker</h2>
+        <p>There are two ways to use it:</p>
+        <ul>
+          <li><strong>From the popup:</strong> click <strong>Pick Color
+          from Screen</strong>, then click on any color anywhere on your
+          screen — this works on any tab, and even outside the browser
+          entirely (another app, an image, etc). This is the most
+          reliable way to trigger it.</li>
+          <li><strong>Keyboard shortcut:</strong> press
+          <code>Ctrl+Shift+U</code> (<code>Cmd+Shift+U</code> on Mac)
+          from anywhere in the browser, then click the color you want.
+          You'll see a small notification confirm the color was copied.</li>
+        </ul>
+        <p>Either way, the hex code of whatever you clicked on (like
+        <code>#ff5733</code>) is copied to your clipboard automatically.
+        Using the popup button also shows the value in the field below
+        the button, in case you need to see it again.</p>
+        <p class="note">If you press Escape or click somewhere that
+        cancels the picker, nothing is copied — that's expected, just try
+        again.</p>
+      </section>
+
+      <section id="reading-output">
+        <h2>7. Reading the output</h2>
+        <p>Each shape in the output looks something like this:</p>
+        <pre>// Square
+glColor3f(1.00, 0.34, 0.20);
+glBegin(GL_POLYGON);
+	glVertex2f(0.00, 0.00);//A
+	glVertex2f(1.00, 0.00);//B
+	glVertex2f(1.00, 1.00);//C
+	glVertex2f(0.00, 1.00);//D
+glEnd();</pre>
+        <ul>
+          <li><strong>The comment line</strong> (<code>// Square</code>)
+          comes from a text label in your GeoGebra construction, if you
+          added one.</li>
+          <li><strong>The color line</strong> appears only if that text
+          label included a color tag, like
+          <code>Square-c(#FF5733)</code>.</li>
+          <li><strong>Each vertex line</strong> is one point's coordinates,
+          with the original point name as a trailing comment so you can
+          trace it back.</li>
+        </ul>
+      </section>
+
+      <section id="troubleshooting">
+        <h2>8. Troubleshooting</h2>
+        <p><strong>Nothing shows up in Output:</strong></p>
+        <ul>
+          <li>Double check you're on the tab with the GeoGebra applet
+          loaded — the extension reads the <em>active</em> tab.</li>
+          <li>Make sure your points are named in a way the extractor
+          recognizes — see <a href="#point-naming">Point naming</a>
+          above.</li>
+          <li>Check that your points aren't all hidden/deselected in the
+          GeoGebra algebra view, or all listed in "Skipped points."</li>
+        </ul>
+        <p><strong>Color picker doesn't do anything:</strong></p>
+        <ul>
+          <li>Using the popup button? Make sure you click the picker
+          button itself first, then click the color you want — the
+          picker only starts after that first click.</li>
+          <li>Using the keyboard shortcut and nothing happens? Chrome
+          shortcuts sometimes get taken over by another extension or a
+          system-level shortcut. Check <code>chrome://extensions/shortcuts</code>
+          to confirm <code>Ctrl+Shift+U</code> is still assigned to this
+          extension, or just use the popup button instead — it always
+          works.</li>
+          <li>This feature needs a fairly recent version of Chrome; if
+          it's still not working, try updating your browser.</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <script src="help.js"></script>
+</body>
+</html>
