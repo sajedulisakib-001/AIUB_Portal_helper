@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Aiub Portal Helper - Beta",
+    "name": "Aiub Portal Helper",
     "version": "3.0.0", 
     "description": "This is a simple Chrome extension for AIUB Students.",
     "action": {
